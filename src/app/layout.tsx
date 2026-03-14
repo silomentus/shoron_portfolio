@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Harun Or Rashid | Software Engineer",
+  title: "Shoron | Software Engineer",
   description:
-    "Portfolio of Md. Harun Or Rashid — Software Engineer specializing in backend development, AI/ML, and full-stack solutions.",
+    "Portfolio of Shoron — Software Engineer specializing in backend development, AI/ML, and full-stack solutions.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   keywords: [
     "software engineer",
     "portfolio",
