@@ -18,6 +18,7 @@ export const personalInfo = {
 export const experience = [
   {
     company: "Appinion BD LTD.",
+    website: "https://appinionbd.com",
     role: "Junior Software Engineer",
     department: "Web Development",
     duration: "Jul 2025 - Present",
@@ -27,7 +28,7 @@ export const experience = [
       "Develop and maintain backend applications using PHP (Laravel) and MySQL, following MVC architecture and RESTful API standards",
       "Contribute to Sajida Foundation's Field Force Management System",
       "Work on Appinion's HRM platform",
-      "Support backend development for consumer finance solutions with API integrations",
+      "Support backend development for enterprise solutions with API integrations",
       "Collaborate on debugging, query optimization, and version control with Git",
     ],
     tech: ["PHP", "Laravel", "MySQL", "REST API", "Git"],

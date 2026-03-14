@@ -44,7 +44,13 @@ export default function Experience() {
                         className="text-accent font-medium"
                         style={{ fontSize: "18px", marginBottom: "4px" }}
                       >
-                        {exp.company}
+                        {exp.website ? (
+                          <a href={exp.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                            {exp.company}
+                          </a>
+                        ) : (
+                          exp.company
+                        )}
                       </p>
                       <p className="text-text-muted" style={{ fontSize: "14px" }}>
                         {exp.department}

@@ -124,11 +124,10 @@ export default function Hero() {
         <motion.p
           variants={itemVariants}
           className="text-text-muted max-w-2xl mx-auto text-base md:text-lg leading-relaxed"
-          style={{ marginBottom: "48px" }}
+          style={{ marginTop: "24px", marginBottom: "48px" }}
         >
           Building scalable backend systems and exploring the frontiers of AI.
-          Currently crafting enterprise solutions at{" "}
-          <span className="text-accent font-medium">Appinion BD</span>.
+          Currently crafting enterprise solutions.
         </motion.p>
 
         <motion.div
