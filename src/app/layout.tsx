@@ -5,9 +5,6 @@ export const metadata: Metadata = {
   title: "Shoron | Software Engineer",
   description:
     "Portfolio of Shoron — Software Engineer specializing in backend development, AI/ML, and full-stack solutions.",
-  icons: {
-    icon: "/favicon.ico",
-  },
   keywords: [
     "software engineer",
     "portfolio",
