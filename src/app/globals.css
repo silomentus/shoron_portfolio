@@ -151,3 +151,10 @@ section {
   initial-value: 0deg;
   inherits: false;
 }
+
+/* Hide scroll indicator when viewport is short (zoom / small screens) */
+@media (max-height: 700px) {
+  .short-hide {
+    display: none !important;
+  }
+}

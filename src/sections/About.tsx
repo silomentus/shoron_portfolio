@@ -57,19 +57,22 @@ export default function About() {
               className="text-text-muted leading-relaxed"
               style={{ fontSize: "17px", lineHeight: "1.8", marginBottom: "24px" }}
             >
-              {personalInfo.summary}
+              {personalInfo.summary.split("North South University")[0]}
+              <a
+                href="https://www.northsouth.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline"
+              >
+                North South University
+              </a>
+              {personalInfo.summary.split("North South University")[1]}
             </p>
             <p
               className="text-text-muted leading-relaxed"
               style={{ fontSize: "17px", lineHeight: "1.8", marginBottom: "40px" }}
             >
-              My academic journey at{" "}
-              <span className="text-accent font-medium">
-                North South University
-              </span>{" "}
-              equipped me with strong foundations in AI, machine learning, and
-              software engineering. I thrive on turning complex problems into
-              elegant, efficient solutions.
+              My academic experience built a strong foundation in artificial intelligence, machine learning, and software engineering. I enjoy solving complex problems and turning ideas into efficient, well-structured systems.
             </p>
 
             {/* Stats */}

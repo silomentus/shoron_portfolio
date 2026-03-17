@@ -4,12 +4,12 @@ export const personalInfo = {
   email: "silomentus@gmail.com",
   location: "Dhaka, Bangladesh",
   summary:
-    "A motivated and detail-oriented Computer Science graduate from North South University, passionate about building scalable software solutions. Currently working as a Junior Software Engineer with expertise in backend development, API design, and AI/ML applications.",
+    "I am a Computer Science graduate from North South University currently working as a Junior Software Engineer. My work focuses on backend development, API design, and building reliable, scalable software solutions.",
   socials: {
     github: "https://github.com/silomentus",
     linkedin: "https://linkedin.com/in/md-harun-or-rashid-309377225",
-    facebook: "https://facebook.com/shoronhr", // UPDATE with your actual URL
-    instagram: "https://instagram.com/shoronhr", // UPDATE with your actual URL
+    facebook: "https://facebook.com/shoronhr", 
+    instagram: "https://instagram.com/shoronhr", 
   },
   // Web3Forms access key — get yours free at https://web3forms.com
   web3formsKey: "4f412ec2-2fbc-49ba-9644-a2a0ec1c561e",
@@ -23,13 +23,13 @@ export const experience = [
     department: "Web Development",
     duration: "Jul 2025 - Present",
     description:
-      "Appinion is software development company and sister concern of Sajida Foundation, providing technology solutions for financial services and enterprise operations.",
+      "Appinion is a software development company and a sister concern of Sajida Foundation, providing technology solutions for financial services and enterprise operations.",
     responsibilities: [
       "Develop and maintain backend applications using PHP (Laravel) and MySQL, following MVC architecture and RESTful API standards",
       "Contribute to Sajida Foundation's Field Force Management System",
-      "Work on Appinion's HRM platform",
-      "Support backend development for enterprise solutions with API integrations",
-      "Collaborate on debugging, query optimization, and version control with Git",
+      "Work on Appinion's HRM platform and related backend services",
+      "Support backend development for enterprise solutions, including API integrations",
+      "Collaborate with team members on debugging, query optimization, and version control using Git",
     ],
     tech: ["PHP", "Laravel", "MySQL", "REST API", "Git"],
   },
@@ -88,13 +88,15 @@ export const projects = [
 
 export const skills = {
   languages: [
-    { name: "PHP (Laravel)", level: 90 },
-    { name: "Python", level: 85 },
-    { name: "JavaScript", level: 80 },
-    { name: "Java", level: 75 },
-    { name: "C/C++", level: 70 },
-    { name: "TypeScript", level: 70 },
-    { name: "HTML/CSS", level: 90 },
+    { name: "PHP", icon: "php" },
+    { name: "Laravel", icon: "laravel" },
+    { name: "Python", icon: "python" },
+    { name: "JavaScript", icon: "javascript" },
+    { name: "Java", icon: "java" },
+    { name: "C/C++", icon: "cplusplus" },
+    { name: "TypeScript", icon: "typescript" },
+    { name: "HTML", icon: "html5" },
+    { name: "CSS", icon: "css3" },
   ],
   backend: [
     "RESTful API Development",
@@ -128,7 +130,7 @@ export const skills = {
 
 export const education = [
   {
-    degree: "B.Sc. in Computer Science & Engineering",
+    degree: "Bachelor of Science in Computer Science and Engineering (BSc in CSE)",
     institution: "North South University, Dhaka",
     duration: "Jul 2020 – Dec 2024",
     result: "CGPA: Hmmm... want to know? Ask me!",

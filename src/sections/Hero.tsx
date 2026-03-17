@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
-import MagneticButton from "@/components/MagneticButton";
 import { personalInfo } from "@/lib/data";
 
 const ParticleField = dynamic(() => import("@/components/ParticleField"), {
@@ -51,6 +50,46 @@ function TypeWriter({ words }: { words: string[] }) {
   );
 }
 
+const taglines = [
+  "Code it. Ship it. Learn from it.",
+  "Clean code over clever code.",
+  "Turning caffeine into backend systems.",
+  "If it works, make it better.",
+  "Building things that matter.",
+  "git commit -m 'life'",
+  "Ctrl + S your expectations"
+];
+
+function RotatingTagline() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % taglines.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="relative font-mono text-text-muted/70 italic"
+      style={{ fontSize: "15px", minHeight: "24px" }}
+    >
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.5 }}
+        >
+          &quot;{taglines[index]}&quot;
+        </motion.span>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function Hero() {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -72,7 +111,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-x-hidden pt-20 pb-20"
     >
       <ParticleField />
 
@@ -93,7 +132,7 @@ export default function Hero() {
         >
           <span className="rounded-full bg-green-500 animate-pulse shrink-0" style={{ width: "8px", height: "8px" }} />
           <span className="text-text-muted font-mono" style={{ fontSize: "14px" }}>
-            Available for opportunities
+            Open to meaningful opportunities
           </span>
         </motion.div>
 
@@ -107,6 +146,14 @@ export default function Hero() {
           </span>
         </motion.h1>
 
+        <motion.p
+          variants={itemVariants}
+          className="text-text-muted font-light tracking-wide"
+          style={{ fontSize: "16px", marginBottom: "20px" }}
+        >
+          Md. Harun Or Rashid
+        </motion.p>
+
         <motion.div
           variants={itemVariants}
           className="text-xl md:text-2xl font-light text-text-muted mb-6 min-h-[2.5rem] flex items-center justify-center"
@@ -117,6 +164,10 @@ export default function Hero() {
               "Backend Developer",
               "AI/ML Enthusiast",
               "Problem Solver",
+              "Bug Creator & Fixer",
+              "Deadline Speedrunner",
+              "Code Poet",
+              "Overengineering Specialist"
             ]}
           />
         </motion.div>
@@ -132,22 +183,9 @@ export default function Hero() {
 
         <motion.div
           variants={itemVariants}
-          className="flex flex-wrap items-center justify-center gap-5"
+          className="flex items-center justify-center"
         >
-          <MagneticButton
-            href="#projects"
-            className="bg-gradient-to-r from-accent to-accent-light text-white font-semibold rounded-full hover:shadow-xl hover:shadow-accent/25 transition-all duration-300"
-            style={{ padding: "14px 32px", fontSize: "15px" }}
-          >
-            View My Work
-          </MagneticButton>
-          <MagneticButton
-            href="#contact"
-            className="border border-white/20 text-text font-semibold rounded-full hover:border-accent hover:text-accent transition-colors duration-300 bg-white/[0.05] backdrop-blur-sm"
-            style={{ padding: "14px 32px", fontSize: "15px" }}
-          >
-            Get in Touch
-          </MagneticButton>
+          <RotatingTagline />
         </motion.div>
       </motion.div>
 
@@ -156,7 +194,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:flex short-hide"
       >
         <motion.div
           animate={{ y: [0, 12, 0] }}
