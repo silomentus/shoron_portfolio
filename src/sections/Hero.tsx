@@ -128,10 +128,10 @@ export default function Hero() {
         <motion.div
           variants={itemVariants}
           className="inline-flex items-center rounded-full border border-border bg-bg-card/50 backdrop-blur-sm whitespace-nowrap"
-          style={{ gap: "10px", padding: "10px 20px", marginBottom: "32px" }}
+          style={{ gap: "6px", padding: "6px 14px", marginBottom: "24px" }}
         >
-          <span className="rounded-full bg-green-500 animate-pulse shrink-0" style={{ width: "8px", height: "8px" }} />
-          <span className="text-text-muted font-mono" style={{ fontSize: "14px" }}>
+          <span className="rounded-full bg-green-500 animate-pulse shrink-0" style={{ width: "6px", height: "6px" }} />
+          <span className="text-text-muted font-mono" style={{ fontSize: "12px" }}>
             Open to meaningful opportunities
           </span>
         </motion.div>
