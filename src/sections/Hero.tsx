@@ -111,7 +111,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-x-hidden pt-20 pb-20"
+      className="relative min-h-[calc(100dvh-60px)] sm:min-h-screen flex flex-col items-center justify-center overflow-x-hidden pt-16 sm:pt-20 pb-12 sm:pb-20"
     >
       <ParticleField />
 
