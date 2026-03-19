@@ -19,7 +19,7 @@ export default function Projects() {
       : projects.filter((p) => p.category === activeCategory);
 
   return (
-    <section id="projects" style={{ padding: "120px 24px" }}>
+    <section id="projects" style={{ padding: "140px 24px" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <SectionHeading title="Projects" subtitle="What I've Built" />
 
@@ -29,7 +29,7 @@ export default function Projects() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="flex flex-wrap justify-center"
-          style={{ gap: "8px", marginBottom: "56px" }}
+          style={{ gap: "6px", marginBottom: "60px" }}
         >
           {categories.map((cat) => (
             <button
@@ -38,18 +38,27 @@ export default function Projects() {
               className={`relative font-medium transition-colors duration-300 ${
                 activeCategory === cat
                   ? "text-white"
-                  : "text-text-muted hover:text-text"
+                  : "text-text-muted hover:text-text-muted"
               }`}
-              style={{ padding: "10px 20px", fontSize: "14px", borderRadius: "12px" }}
+              style={{
+                padding: "9px 18px",
+                fontSize: "13px",
+                borderRadius: "10px",
+              }}
             >
               {activeCategory === cat && (
                 <motion.div
                   layoutId="active-filter"
-                  className="absolute inset-0 bg-accent"
-                  style={{ borderRadius: "12px" }}
+                  className="absolute inset-0"
+                  style={{
+                    borderRadius: "10px",
+                    background:
+                      "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
+                    boxShadow: "0 4px 20px rgba(99, 102, 241, 0.2)",
+                  }}
                   transition={{
                     type: "spring",
-                    stiffness: 380,
+                    stiffness: 350,
                     damping: 30,
                   }}
                 />
@@ -65,7 +74,7 @@ export default function Projects() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "24px",
+            gap: "20px",
           }}
         >
           <AnimatePresence mode="popLayout">
@@ -73,37 +82,49 @@ export default function Projects() {
               <motion.div
                 key={project.title}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                whileHover={{ y: -8 }}
+                initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0, 1] }}
+                whileHover={{ y: -6 }}
                 className="group"
                 style={{ position: "relative" }}
               >
                 <div
-                  className="h-full bg-bg-card border border-border hover:border-accent/30 transition-all duration-500 flex flex-col"
-                  style={{ padding: "28px", borderRadius: "20px" }}
+                  className="h-full glass-card-hover flex flex-col"
+                  style={{ padding: "28px", borderRadius: "18px" }}
                 >
                   {/* Category badge + arrow */}
                   <div
                     className="flex items-center justify-between"
-                    style={{ marginBottom: "20px" }}
+                    style={{ marginBottom: "22px" }}
                   >
                     <span
-                      className="font-mono bg-accent/10 text-accent"
-                      style={{ padding: "6px 14px", fontSize: "12px", borderRadius: "999px" }}
+                      className="font-mono"
+                      style={{
+                        padding: "5px 12px",
+                        fontSize: "11px",
+                        borderRadius: "6px",
+                        background: "rgba(129, 140, 248, 0.08)",
+                        color: "var(--color-accent-light)",
+                        border: "1px solid rgba(129, 140, 248, 0.1)",
+                        letterSpacing: "0.02em",
+                      }}
                     >
                       {project.category}
                     </span>
                     <motion.div
                       whileHover={{ rotate: 45 }}
-                      className="border border-border flex items-center justify-center group-hover:border-accent/50 transition-colors rounded-full"
-                      style={{ width: "36px", height: "36px" }}
+                      className="flex items-center justify-center rounded-full group-hover:border-accent/30 transition-all duration-500"
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        border: "1px solid var(--color-border)",
+                      }}
                     >
                       <svg
-                        className="text-text-muted group-hover:text-accent transition-colors"
-                        style={{ width: "14px", height: "14px" }}
+                        className="text-text-muted/70 group-hover:text-accent transition-colors duration-500"
+                        style={{ width: "12px", height: "12px" }}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -120,42 +141,53 @@ export default function Projects() {
 
                   {/* Content */}
                   <h3
-                    className="font-bold text-text group-hover:text-accent transition-colors"
-                    style={{ fontSize: "20px", marginBottom: "6px" }}
+                    className="font-display font-bold text-text group-hover:text-accent transition-colors duration-500"
+                    style={{
+                      fontSize: "19px",
+                      marginBottom: "6px",
+                      letterSpacing: "-0.01em",
+                    }}
                   >
                     {project.title}
                   </h3>
                   <p
-                    className="text-accent/60 font-mono"
-                    style={{ fontSize: "13px", marginBottom: "14px" }}
+                    className="text-accent/40 font-mono"
+                    style={{
+                      fontSize: "12px",
+                      marginBottom: "14px",
+                    }}
                   >
                     {project.subtitle}
                   </p>
                   <p
                     className="text-text-muted flex-1"
-                    style={{ fontSize: "14px", lineHeight: "1.7", marginBottom: "24px" }}
+                    style={{
+                      fontSize: "14px",
+                      lineHeight: 1.75,
+                      marginBottom: "24px",
+                    }}
                   >
                     {project.description}
                   </p>
 
                   {/* Tech */}
-                  <div className="flex flex-wrap" style={{ gap: "8px" }}>
+                  <div className="flex flex-wrap" style={{ gap: "6px" }}>
                     {project.tech.map((t) => (
                       <span
                         key={t}
-                        className="font-mono bg-bg-secondary text-text-muted border border-border"
-                        style={{ padding: "5px 10px", fontSize: "11px", borderRadius: "8px" }}
+                        className="font-mono text-text-muted/50"
+                        style={{
+                          padding: "4px 10px",
+                          fontSize: "11px",
+                          borderRadius: "6px",
+                          backgroundColor: "rgba(12, 12, 17, 0.8)",
+                          border: "1px solid var(--color-border)",
+                        }}
                       >
                         {t}
                       </span>
                     ))}
                   </div>
-
-                  {/* Hover glow */}
-                  <div
-                    className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ borderRadius: "20px" }}
-                  />
                 </div>
               </motion.div>
             ))}

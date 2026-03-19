@@ -6,63 +6,103 @@ import { experience } from "@/lib/data";
 
 export default function Experience() {
   return (
-    <section id="experience" style={{ padding: "120px 24px" }}>
+    <section id="experience" style={{ padding: "140px 24px" }}>
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         <SectionHeading title="Experience" subtitle="Where I've Worked" />
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "40px",
+          }}
+        >
           {experience.map((exp, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{
+                duration: 0.8,
+                ease: [0.25, 0.1, 0, 1],
+              }}
               className="group"
             >
               <div
-                className="bg-bg-card/50 border border-border hover:border-accent/30 transition-all duration-500 backdrop-blur-sm overflow-hidden"
-                style={{ position: "relative", padding: "40px", borderRadius: "20px" }}
+                className="glass-card-hover overflow-hidden"
+                style={{
+                  position: "relative",
+                  padding: "44px",
+                  borderRadius: "20px",
+                }}
               >
-                {/* Background gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Subtle gradient on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at 30% 20%, rgba(129, 140, 248, 0.04) 0%, transparent 60%)",
+                  }}
+                />
 
                 <div style={{ position: "relative", zIndex: 10 }}>
                   {/* Header */}
                   <div
                     className="flex flex-col md:flex-row md:items-start md:justify-between"
-                    style={{ gap: "16px", marginBottom: "24px" }}
+                    style={{ gap: "16px", marginBottom: "28px" }}
                   >
                     <div>
                       <h3
-                        className="font-bold text-text group-hover:text-accent transition-colors"
-                        style={{ fontSize: "28px", marginBottom: "8px" }}
+                        className="font-display font-bold text-text group-hover:text-accent transition-colors duration-500"
+                        style={{
+                          fontSize: "26px",
+                          marginBottom: "10px",
+                          letterSpacing: "-0.02em",
+                        }}
                       >
                         {exp.role}
                       </h3>
                       <p
-                        className="text-accent font-medium"
-                        style={{ fontSize: "18px", marginBottom: "4px" }}
+                        className="text-accent/80 font-medium"
+                        style={{ fontSize: "17px", marginBottom: "4px" }}
                       >
                         {exp.website ? (
-                          <a href={exp.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          <a
+                            href={exp.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-accent transition-colors duration-300"
+                            style={{ textDecoration: "none" }}
+                          >
                             {exp.company}
                           </a>
                         ) : (
                           exp.company
                         )}
                       </p>
-                      <p className="text-text-muted" style={{ fontSize: "14px" }}>
+                      <p
+                        className="text-text-muted/80"
+                        style={{ fontSize: "14px" }}
+                      >
                         {exp.department}
                       </p>
                     </div>
                     <div
-                      className="flex items-center bg-accent/10 border border-accent/20 text-accent font-mono shrink-0"
-                      style={{ gap: "8px", padding: "8px 16px", borderRadius: "999px", fontSize: "14px" }}
+                      className="flex items-center text-accent/80 font-mono shrink-0"
+                      style={{
+                        gap: "8px",
+                        padding: "8px 18px",
+                        borderRadius: "999px",
+                        fontSize: "13px",
+                        background:
+                          "linear-gradient(135deg, rgba(129, 140, 248, 0.08), rgba(167, 139, 250, 0.04))",
+                        border: "1px solid rgba(129, 140, 248, 0.12)",
+                      }}
                     >
                       <span
-                        className="bg-green-500 animate-pulse rounded-full"
-                        style={{ width: "8px", height: "8px" }}
+                        className="bg-emerald-400 animate-pulse rounded-full"
+                        style={{ width: "6px", height: "6px" }}
                       />
                       {exp.duration}
                     </div>
@@ -70,40 +110,71 @@ export default function Experience() {
 
                   <p
                     className="text-text-muted leading-relaxed"
-                    style={{ fontSize: "15px", lineHeight: "1.7", marginBottom: "28px" }}
+                    style={{
+                      fontSize: "15px",
+                      lineHeight: 1.8,
+                      marginBottom: "28px",
+                    }}
                   >
                     {exp.description}
                   </p>
 
                   {/* Responsibilities */}
-                  <ul style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
+                  <ul
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "14px",
+                      marginBottom: "36px",
+                    }}
+                  >
                     {exp.responsibilities.map((resp, i) => (
                       <motion.li
                         key={i}
-                        initial={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, x: -15 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.1 * i, duration: 0.5 }}
+                        transition={{
+                          delay: 0.08 * i,
+                          duration: 0.5,
+                          ease: [0.25, 0.1, 0, 1],
+                        }}
                         className="flex items-start text-text-muted"
-                        style={{ gap: "12px" }}
+                        style={{ gap: "14px" }}
                       >
                         <span
-                          className="bg-accent rounded-full shrink-0"
-                          style={{ width: "6px", height: "6px", marginTop: "8px" }}
+                          className="rounded-full shrink-0"
+                          style={{
+                            width: "5px",
+                            height: "5px",
+                            marginTop: "8px",
+                            backgroundColor: "var(--color-accent)",
+                            opacity: 0.6,
+                          }}
                         />
-                        <span style={{ fontSize: "15px", lineHeight: "1.6" }}>{resp}</span>
+                        <span style={{ fontSize: "14px", lineHeight: 1.7 }}>
+                          {resp}
+                        </span>
                       </motion.li>
                     ))}
                   </ul>
 
                   {/* Tech stack */}
-                  <div className="flex flex-wrap" style={{ gap: "10px" }}>
+                  <div className="flex flex-wrap" style={{ gap: "8px" }}>
                     {exp.tech.map((t) => (
                       <motion.span
                         key={t}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        className="font-mono bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors cursor-default"
-                        style={{ padding: "8px 16px", fontSize: "13px", borderRadius: "10px" }}
+                        whileHover={{ scale: 1.04, y: -2 }}
+                        className="font-mono transition-all duration-300 cursor-default"
+                        style={{
+                          padding: "7px 14px",
+                          fontSize: "12px",
+                          borderRadius: "8px",
+                          background:
+                            "linear-gradient(135deg, rgba(129, 140, 248, 0.1), rgba(129, 140, 248, 0.04))",
+                          border: "1px solid rgba(129, 140, 248, 0.12)",
+                          color: "var(--color-accent-light)",
+                        }}
                       >
                         {t}
                       </motion.span>

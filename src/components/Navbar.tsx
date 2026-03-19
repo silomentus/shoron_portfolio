@@ -29,12 +29,12 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: [0.25, 0.1, 0, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
           scrolled
-            ? "bg-bg/80 backdrop-blur-xl shadow-lg shadow-black/10"
+            ? "bg-bg/60 backdrop-blur-2xl shadow-lg shadow-black/20"
             : "bg-transparent"
         }`}
       >
@@ -42,33 +42,52 @@ export default function Navbar() {
           className="w-full mx-auto flex items-center justify-center relative"
           style={{ padding: "16px 24px", maxWidth: "1440px" }}
         >
-          {/* Desktop nav — always centered on screen */}
-          <div className="hidden md:flex items-center fixed left-1/2 -translate-x-1/2 top-5" style={{ zIndex: 50 }}>
+          {/* Desktop nav — centered pill */}
+          <div
+            className="hidden md:flex items-center fixed left-1/2 -translate-x-1/2 top-5"
+            style={{ zIndex: 50 }}
+          >
             <div
-              className="flex items-center bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-full"
-              style={{ padding: "5px 6px", gap: "2px" }}
+              className="flex items-center backdrop-blur-xl border rounded-full"
+              style={{
+                padding: "4px 5px",
+                gap: "1px",
+                backgroundColor: "rgba(12, 12, 17, 0.7)",
+                borderColor: "rgba(26, 26, 37, 0.6)",
+              }}
             >
               {navLinks.map((link) => {
-                const isActive = activeSection === link.href.replace("#", "");
+                const isActive =
+                  activeSection === link.href.replace("#", "");
                 return (
                   <a
                     key={link.name}
                     href={link.href}
                     className={`relative inline-block whitespace-nowrap font-medium transition-colors duration-300 rounded-full ${
-                      isActive ? "text-white" : "text-white/50 hover:text-white/80"
+                      isActive
+                        ? "text-white"
+                        : "text-white/40 hover:text-white/70"
                     }`}
-                    style={{ padding: "10px 22px", fontSize: "14px" }}
+                    style={{
+                      padding: "9px 20px",
+                      fontSize: "13px",
+                      letterSpacing: "0.01em",
+                    }}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-0 bg-accent/25 border border-accent/40 rounded-full"
+                        className="absolute inset-0 rounded-full"
                         style={{
-                          boxShadow: "0 0 12px rgba(108, 99, 255, 0.2)",
+                          background:
+                            "linear-gradient(135deg, rgba(129, 140, 248, 0.2), rgba(167, 139, 250, 0.12))",
+                          border: "1px solid rgba(129, 140, 248, 0.25)",
+                          boxShadow:
+                            "0 0 20px rgba(129, 140, 248, 0.1), inset 0 0 20px rgba(129, 140, 248, 0.05)",
                         }}
                         transition={{
                           type: "spring",
-                          stiffness: 400,
+                          stiffness: 350,
                           damping: 30,
                         }}
                       />
@@ -80,16 +99,25 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* CTA button — fixed to top right */}
-          <a
+          {/* CTA button — top right */}
+          <motion.a
             href="#contact"
-            className="hidden md:inline-flex bg-accent hover:bg-accent-light text-white font-semibold rounded-full transition-colors duration-300 shrink-0 fixed top-4 right-8"
-            style={{ padding: "10px 24px", fontSize: "14px", zIndex: 50 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="hidden md:inline-flex text-white font-medium rounded-full transition-all duration-300 shrink-0 fixed top-4 right-8"
+            style={{
+              padding: "9px 22px",
+              fontSize: "13px",
+              zIndex: 50,
+              background:
+                "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
+              boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)",
+            }}
           >
             Let&apos;s Talk
-          </a>
+          </motion.a>
 
-          {/* Mobile toggle — pinned to the right */}
+          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden flex flex-col p-3 absolute right-6"
@@ -97,19 +125,37 @@ export default function Navbar() {
             aria-label="Toggle menu"
           >
             <motion.span
-              animate={mobileOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-              className="block bg-text rounded-full"
-              style={{ width: "24px", height: "2px" }}
+              animate={
+                mobileOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }
+              }
+              className="block rounded-full"
+              style={{
+                width: "22px",
+                height: "1.5px",
+                backgroundColor: "var(--color-text)",
+              }}
             />
             <motion.span
               animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-              className="block bg-text rounded-full"
-              style={{ width: "24px", height: "2px" }}
+              className="block rounded-full"
+              style={{
+                width: "22px",
+                height: "1.5px",
+                backgroundColor: "var(--color-text)",
+              }}
             />
             <motion.span
-              animate={mobileOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-              className="block bg-text rounded-full"
-              style={{ width: "24px", height: "2px" }}
+              animate={
+                mobileOpen
+                  ? { rotate: -45, y: -8 }
+                  : { rotate: 0, y: 0 }
+              }
+              className="block rounded-full"
+              style={{
+                width: "22px",
+                height: "1.5px",
+                backgroundColor: "var(--color-text)",
+              }}
             />
           </button>
         </div>
@@ -119,29 +165,42 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-bg/95 backdrop-blur-xl md:hidden"
-            style={{ paddingTop: "100px", paddingLeft: "32px", paddingRight: "32px" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 md:hidden"
+            style={{
+              backgroundColor: "rgba(6, 6, 8, 0.97)",
+              backdropFilter: "blur(30px)",
+              paddingTop: "100px",
+              paddingLeft: "40px",
+              paddingRight: "40px",
+            }}
           >
-            <ul className="flex flex-col" style={{ gap: "24px" }}>
+            <ul
+              className="flex flex-col"
+              style={{ gap: "8px" }}
+            >
               {navLinks.map((link, i) => (
                 <motion.li
                   key={link.name}
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{
+                    delay: i * 0.08,
+                    ease: [0.25, 0.1, 0, 1],
+                  }}
                 >
                   <a
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`font-bold transition-colors ${
+                    className={`block font-display font-semibold transition-colors py-3 ${
                       activeSection === link.href.replace("#", "")
                         ? "text-accent"
-                        : "text-text hover:text-accent"
+                        : "text-text/60 hover:text-accent"
                     }`}
-                    style={{ fontSize: "32px" }}
+                    style={{ fontSize: "36px", letterSpacing: "-0.02em" }}
                   >
                     {link.name}
                   </a>

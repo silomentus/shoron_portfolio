@@ -15,13 +15,27 @@ const CustomCursor = dynamic(() => import("@/components/CustomCursor"), {
   ssr: false,
 });
 
+const SpaceBackground = dynamic(
+  () => import("@/components/SpaceBackground"),
+  { ssr: false }
+);
+
+const ReactionBar = dynamic(() => import("@/components/ReactionBar"), {
+  ssr: false,
+});
+
+const SpaceGame = dynamic(() => import("@/components/SpaceGame"), {
+  ssr: false,
+});
+
 export default function Home() {
   return (
     <>
+      <SpaceBackground />
       <CustomCursor />
       <ScrollProgress />
       <Navbar />
-      <main>
+      <main className="relative z-[1]">
         <Hero />
         <About />
         <Experience />
@@ -30,6 +44,8 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <ReactionBar />
+      <SpaceGame />
     </>
   );
 }

@@ -10,14 +10,19 @@ export default function SectionHeading({
   subtitle: string;
 }) {
   return (
-    <div style={{ textAlign: "center", marginBottom: "72px" }}>
+    <div style={{ textAlign: "center", marginBottom: "80px" }}>
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-accent font-mono uppercase"
-        style={{ fontSize: "14px", letterSpacing: "3px", marginBottom: "12px" }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0, 1] }}
+        className="font-mono uppercase text-accent"
+        style={{
+          fontSize: "12px",
+          letterSpacing: "4px",
+          marginBottom: "16px",
+          fontWeight: 500,
+        }}
       >
         {subtitle}
       </motion.p>
@@ -25,19 +30,28 @@ export default function SectionHeading({
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="font-bold text-text"
-        style={{ fontSize: "clamp(32px, 5vw, 48px)" }}
+        transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0, 1] }}
+        className="font-display font-bold text-text"
+        style={{
+          fontSize: "clamp(32px, 5vw, 52px)",
+          letterSpacing: "-0.03em",
+          lineHeight: 1.1,
+        }}
       >
         {title}
       </motion.h2>
       <motion.div
-        initial={{ width: 0 }}
-        whileInView={{ width: 80 }}
+        initial={{ width: 0, opacity: 0 }}
+        whileInView={{ width: 60, opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        className="bg-gradient-to-r from-accent to-accent-light mx-auto rounded-full"
-        style={{ height: "4px", marginTop: "20px" }}
+        transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0, 1] }}
+        className="mx-auto rounded-full"
+        style={{
+          height: "2px",
+          marginTop: "24px",
+          background:
+            "linear-gradient(90deg, var(--color-accent-dark), var(--color-accent-light))",
+        }}
       />
     </div>
   );

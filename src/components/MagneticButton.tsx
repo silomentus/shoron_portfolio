@@ -23,14 +23,18 @@ export default function MagneticButton({
     if (!ref.current) return;
     const { clientX, clientY } = e;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const x = (clientX - (left + width / 2)) * 0.3;
-    const y = (clientY - (top + height / 2)) * 0.3;
+    const x = (clientX - (left + width / 2)) * 0.25;
+    const y = (clientY - (top + height / 2)) * 0.25;
     setPosition({ x, y });
   };
 
   const reset = () => setPosition({ x: 0, y: 0 });
 
-  const isExternal = href && !href.startsWith("#") && !href.startsWith("mailto:") && !href.startsWith("tel:");
+  const isExternal =
+    href &&
+    !href.startsWith("#") &&
+    !href.startsWith("mailto:") &&
+    !href.startsWith("tel:");
 
   return (
     <motion.div
@@ -38,7 +42,12 @@ export default function MagneticButton({
       onMouseMove={handleMouse}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      transition={{
+        type: "spring",
+        stiffness: 150,
+        damping: 15,
+        mass: 0.1,
+      }}
       className="inline-block"
     >
       {href ? (
@@ -47,12 +56,18 @@ export default function MagneticButton({
           onClick={onClick}
           className={`inline-block ${className}`}
           style={style}
-          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          {...(isExternal
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
         >
           {children}
         </a>
       ) : (
-        <button onClick={onClick} className={`inline-block ${className}`} style={style}>
+        <button
+          onClick={onClick}
+          className={`inline-block ${className}`}
+          style={style}
+        >
           {children}
         </button>
       )}
