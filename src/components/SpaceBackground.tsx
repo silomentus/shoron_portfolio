@@ -529,19 +529,13 @@ export default function SpaceBackground() {
   const [canvasReady, setCanvasReady] = useState(false);
 
   useEffect(() => {
-    // Defer Three.js initialization to let the main content paint first
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => setCanvasReady(true), { timeout: 1500 })
-      : setTimeout(() => setCanvasReady(true), 800) as unknown as number;
-    return () => {
-      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
+    // Defer just one frame so the main content can paint first
+    const id = requestAnimationFrame(() => setCanvasReady(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const cloudStyle = {
     willChange: "transform, opacity" as const,
-    contain: "layout style paint" as const,
   };
 
   return (
