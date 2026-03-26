@@ -529,31 +529,27 @@ export default function SpaceBackground() {
   const [canvasReady, setCanvasReady] = useState(false);
 
   useEffect(() => {
-    // Defer just one frame so the main content can paint first
+    if (MOBILE) return; // No Three.js on mobile — CSS-only background
     const id = requestAnimationFrame(() => setCanvasReady(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const cloudStyle = {
-    willChange: "transform, opacity" as const,
-  };
-
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* CSS Smoke Clouds — large blurred orbs drifting slowly */}
+      {/* CSS Smoke Clouds */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Cloud 1 — top left, indigo */}
         <div
           className="absolute smoke-cloud-1"
           style={{
-            ...cloudStyle,
             width: MOBILE ? "300px" : "600px",
             height: MOBILE ? "300px" : "600px",
             top: "-10%",
             left: "-5%",
-            background:
-              "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(40px)" : "blur(80px)",
+            background: MOBILE
+              ? "radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.03) 40%, transparent 70%)"
+              : "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%)",
+            filter: MOBILE ? "blur(30px)" : "blur(80px)",
             borderRadius: "50%",
           }}
         />
@@ -561,71 +557,73 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-2"
           style={{
-            ...cloudStyle,
             width: MOBILE ? "250px" : "500px",
             height: MOBILE ? "250px" : "500px",
             top: "20%",
             right: "-8%",
-            background:
-              "radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.015) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(50px)" : "blur(100px)",
+            background: MOBILE
+              ? "radial-gradient(circle, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.02) 40%, transparent 70%)"
+              : "radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.015) 40%, transparent 70%)",
+            filter: MOBILE ? "blur(30px)" : "blur(100px)",
             borderRadius: "50%",
           }}
         />
-        {/* Cloud 3 — center, deep blue */}
-        <div
-          className="absolute smoke-cloud-3"
-          style={{
-            ...cloudStyle,
-            width: MOBILE ? "350px" : "700px",
-            height: MOBILE ? "250px" : "500px",
-            top: "40%",
-            left: "20%",
-            background:
-              "radial-gradient(ellipse, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.01) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(45px)" : "blur(90px)",
-            borderRadius: "50%",
-          }}
-        />
+        {/* Cloud 3 — center, deep blue (desktop only) */}
+        {!MOBILE && (
+          <div
+            className="absolute smoke-cloud-3"
+            style={{
+              width: "700px",
+              height: "500px",
+              top: "40%",
+              left: "20%",
+              background:
+                "radial-gradient(ellipse, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.01) 40%, transparent 70%)",
+              filter: "blur(90px)",
+              borderRadius: "50%",
+            }}
+          />
+        )}
         {/* Cloud 4 — bottom, warm violet */}
         <div
-          className="absolute smoke-cloud-4"
+          className={`absolute ${MOBILE ? "smoke-cloud-3" : "smoke-cloud-4"}`}
           style={{
-            ...cloudStyle,
             width: MOBILE ? "275px" : "550px",
             height: MOBILE ? "275px" : "550px",
             bottom: "-5%",
             left: "50%",
             transform: "translateX(-50%)",
-            background:
-              "radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.015) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(50px)" : "blur(100px)",
+            background: MOBILE
+              ? "radial-gradient(circle, rgba(167, 139, 250, 0.10) 0%, rgba(167, 139, 250, 0.02) 40%, transparent 70%)"
+              : "radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.015) 40%, transparent 70%)",
+            filter: MOBILE ? "blur(30px)" : "blur(100px)",
             borderRadius: "50%",
           }}
         />
-        {/* Cloud 5 — bottom left accent */}
-        <div
-          className="absolute smoke-cloud-5"
-          style={{
-            ...cloudStyle,
-            width: MOBILE ? "200px" : "400px",
-            height: MOBILE ? "200px" : "400px",
-            bottom: "20%",
-            left: "-5%",
-            background:
-              "radial-gradient(circle, rgba(129, 140, 248, 0.05) 0%, transparent 60%)",
-            filter: MOBILE ? "blur(40px)" : "blur(80px)",
-            borderRadius: "50%",
-          }}
-        />
+        {/* Cloud 5 — bottom left accent (desktop only) */}
+        {!MOBILE && (
+          <div
+            className="absolute smoke-cloud-5"
+            style={{
+              width: "400px",
+              height: "400px",
+              bottom: "20%",
+              left: "-5%",
+              background:
+                "radial-gradient(circle, rgba(129, 140, 248, 0.05) 0%, transparent 60%)",
+              filter: "blur(80px)",
+              borderRadius: "50%",
+            }}
+          />
+        )}
       </div>
 
-      {/* Three.js Canvas — deferred to avoid blocking initial paint */}
+      {/* Three.js Canvas — desktop only */}
       {canvasReady && (
         <Canvas
           camera={{ position: [0, 0, 7], fov: 60 }}
-          dpr={MOBILE ? [1, 1] : [1, 1.5]}
-          gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: false, alpha: true }}
           style={{
             background: "transparent",
             position: "absolute",
@@ -639,7 +637,7 @@ export default function SpaceBackground() {
           <RainStreaks />
           <Stars />
           <BrightStars />
-          {!MOBILE && <ShootingStars />}
+          <ShootingStars />
         </Canvas>
       )}
 

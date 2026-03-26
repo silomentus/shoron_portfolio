@@ -111,7 +111,7 @@ textarea:-webkit-autofill:focus {
   text-shadow: 0 0 80px rgba(129, 140, 248, 0.3);
 }
 
-/* Noise texture overlay — use static background-size to avoid expensive re-renders */
+/* Noise texture overlay — disabled on mobile (feTurbulence is GPU-heavy) */
 .noise::after {
   content: "";
   position: fixed;
@@ -121,7 +121,12 @@ textarea:-webkit-autofill:focus {
   pointer-events: none;
   z-index: 0;
   opacity: 0.4;
-  will-change: auto;
+}
+
+@media (max-width: 767px) {
+  .noise::after {
+    display: none;
+  }
 }
 
 /* Ambient gradient background */
@@ -264,7 +269,6 @@ textarea:focus {
 .smoke-cloud-4,
 .smoke-cloud-5 {
   will-change: transform, opacity;
-  contain: layout style paint;
   backface-visibility: hidden;
 }
 .smoke-cloud-1 {
@@ -359,5 +363,32 @@ textarea:focus {
   50% {
     transform: translate(45px, -30px) scale(1.12);
     opacity: 0.9;
+  }
+}
+
+/* Mobile: simpler drift — translate only, no scale (scale on blurred elements is very expensive) */
+@media (max-width: 767px) {
+  .smoke-cloud-1,
+  .smoke-cloud-2,
+  .smoke-cloud-3,
+  .smoke-cloud-4,
+  .smoke-cloud-5 {
+    will-change: auto;
+  }
+  .smoke-cloud-1 { animation: drift-m1 30s ease-in-out infinite; }
+  .smoke-cloud-2 { animation: drift-m2 35s ease-in-out infinite; }
+  .smoke-cloud-3 { animation: drift-m3 32s ease-in-out infinite; }
+
+  @keyframes drift-m1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(20px, 15px); }
+  }
+  @keyframes drift-m2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-25px, 15px); }
+  }
+  @keyframes drift-m3 {
+    0%, 100% { transform: translateX(-50%) translate(0, 0); }
+    50% { transform: translateX(-50%) translate(20px, -10px); }
   }
 }
