@@ -97,6 +97,6 @@ This project is the personal portfolio of **Shoron**. You're welcome to take ins
 
 <div align="center">
 
-**Built with care by [Shoron](https://shoron.vercel.app)**
+**Built with care by [Shoron](https://www.linkedin.com/in/md-harun-or-rashid-309377225/)**
 
 </div>
