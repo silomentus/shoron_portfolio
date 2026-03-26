@@ -14,22 +14,24 @@
   --color-border: #1a1a25;
   --color-border-light: #252535;
   --color-highlight: #f0abfc;
-  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
-  --font-display: "Sora", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: var(--font-dm-sans), "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-sora), "Sora", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jb-mono), "JetBrains Mono", "Fira Code", monospace;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  cursor: none !important;
 }
 
-html,
-html body,
-html * {
-  cursor: none !important;
+@media (pointer: fine) {
+  *,
+  html,
+  html body,
+  html * {
+    cursor: none !important;
+  }
 }
 
 html {
@@ -109,15 +111,17 @@ textarea:-webkit-autofill:focus {
   text-shadow: 0 0 80px rgba(129, 140, 248, 0.3);
 }
 
-/* Noise texture overlay */
+/* Noise texture overlay — use static background-size to avoid expensive re-renders */
 .noise::after {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
   pointer-events: none;
   z-index: 0;
   opacity: 0.4;
+  will-change: auto;
 }
 
 /* Ambient gradient background */
@@ -254,6 +258,15 @@ textarea:focus {
 }
 
 /* ═══ Smoke cloud drift animations ═══ */
+.smoke-cloud-1,
+.smoke-cloud-2,
+.smoke-cloud-3,
+.smoke-cloud-4,
+.smoke-cloud-5 {
+  will-change: transform, opacity;
+  contain: layout style paint;
+  backface-visibility: hidden;
+}
 .smoke-cloud-1 {
   animation: drift1 25s ease-in-out infinite;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -29,12 +30,26 @@ const SpaceGame = dynamic(() => import("@/components/SpaceGame"), {
 });
 
 export default function Home() {
+  // Defer non-critical components until after initial paint
+  const [deferred, setDeferred] = useState(false);
+  const [gameOpen, setGameOpen] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setDeferred(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const handlePlayGame = useCallback(() => setGameOpen(true), []);
+  const handleGameOpenChange = useCallback((open: boolean) => setGameOpen(open), []);
+
   return (
     <>
       <SpaceBackground />
-      <CustomCursor />
+      {deferred && <CustomCursor />}
       <ScrollProgress />
-      <Navbar />
+      <Navbar onPlayGame={handlePlayGame} />
       <main className="relative z-[1]">
         <Hero />
         <About />
@@ -44,8 +59,8 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
-      <ReactionBar />
-      <SpaceGame />
+      {deferred && <ReactionBar />}
+      {deferred && <SpaceGame open={gameOpen} onOpenChange={handleGameOpenChange} />}
     </>
   );
 }

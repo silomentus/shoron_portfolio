@@ -1,13 +1,23 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useCallback } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 /* ═══════════════════════════════════════════
+   DEVICE DETECTION — reduce work on mobile
+   ═══════════════════════════════════════════ */
+function isMobile() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent);
+}
+
+const MOBILE = typeof window !== "undefined" && isMobile();
+
+/* ═══════════════════════════════════════════
    RAIN — diagonal streaks with subtle glow
    ═══════════════════════════════════════════ */
-const RAIN_COUNT = 800;
+const RAIN_COUNT = MOBILE ? 200 : 800;
 
 function Rain() {
   const meshRef = useRef<THREE.Points>(null);
@@ -73,7 +83,7 @@ function Rain() {
 /* ═══════════════════════════════════════════
    RAIN STREAKS — elongated lines for rain feel
    ═══════════════════════════════════════════ */
-const STREAK_COUNT = 300;
+const STREAK_COUNT = MOBILE ? 80 : 300;
 
 function RainStreaks() {
   const meshRef = useRef<THREE.LineSegments>(null);
@@ -158,7 +168,7 @@ function RainStreaks() {
 /* ═══════════════════════════════════════════
    STARS — twinkling space dust
    ═══════════════════════════════════════════ */
-const STAR_COUNT = 250;
+const STAR_COUNT = MOBILE ? 80 : 250;
 
 function Stars() {
   const meshRef = useRef<THREE.Points>(null);
@@ -212,7 +222,7 @@ function Stars() {
 /* ═══════════════════════════════════════════
    BRIGHT STARS — larger, pulsing accent stars
    ═══════════════════════════════════════════ */
-const BRIGHT_COUNT = 20;
+const BRIGHT_COUNT = MOBILE ? 8 : 20;
 
 function BrightStars() {
   const meshRef = useRef<THREE.Points>(null);
@@ -340,7 +350,7 @@ function NebulaMesh() {
           float value = 0.0;
           float amp = 0.5;
           float freq = 1.0;
-          for (int i = 0; i < 5; i++) {
+          for (int i = 0; i < ${MOBILE ? 3 : 5}; i++) {
             value += amp * snoise(p * freq);
             freq *= 2.0;
             amp *= 0.5;
@@ -403,7 +413,7 @@ function NebulaMesh() {
 /* ═══════════════════════════════════════════
    SHOOTING STARS — occasional fast streaks
    ═══════════════════════════════════════════ */
-const MAX_SHOOTING = 6;
+const MAX_SHOOTING = MOBILE ? 2 : 6;
 
 function ShootingStars() {
   const groupRef = useRef<THREE.Group>(null);
@@ -516,6 +526,24 @@ function ShootingStars() {
    MAIN SPACE BACKGROUND COMPONENT
    ═══════════════════════════════════════════ */
 export default function SpaceBackground() {
+  const [canvasReady, setCanvasReady] = useState(false);
+
+  useEffect(() => {
+    // Defer Three.js initialization to let the main content paint first
+    const id = requestIdleCallback
+      ? requestIdleCallback(() => setCanvasReady(true), { timeout: 1500 })
+      : setTimeout(() => setCanvasReady(true), 800) as unknown as number;
+    return () => {
+      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, []);
+
+  const cloudStyle = {
+    willChange: "transform, opacity" as const,
+    contain: "layout style paint" as const,
+  };
+
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       {/* CSS Smoke Clouds — large blurred orbs drifting slowly */}
@@ -524,13 +552,14 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-1"
           style={{
-            width: "600px",
-            height: "600px",
+            ...cloudStyle,
+            width: MOBILE ? "300px" : "600px",
+            height: MOBILE ? "300px" : "600px",
             top: "-10%",
             left: "-5%",
             background:
               "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%)",
-            filter: "blur(80px)",
+            filter: MOBILE ? "blur(40px)" : "blur(80px)",
             borderRadius: "50%",
           }}
         />
@@ -538,13 +567,14 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-2"
           style={{
-            width: "500px",
-            height: "500px",
+            ...cloudStyle,
+            width: MOBILE ? "250px" : "500px",
+            height: MOBILE ? "250px" : "500px",
             top: "20%",
             right: "-8%",
             background:
               "radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.015) 40%, transparent 70%)",
-            filter: "blur(100px)",
+            filter: MOBILE ? "blur(50px)" : "blur(100px)",
             borderRadius: "50%",
           }}
         />
@@ -552,13 +582,14 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-3"
           style={{
-            width: "700px",
-            height: "500px",
+            ...cloudStyle,
+            width: MOBILE ? "350px" : "700px",
+            height: MOBILE ? "250px" : "500px",
             top: "40%",
             left: "20%",
             background:
               "radial-gradient(ellipse, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.01) 40%, transparent 70%)",
-            filter: "blur(90px)",
+            filter: MOBILE ? "blur(45px)" : "blur(90px)",
             borderRadius: "50%",
           }}
         />
@@ -566,14 +597,15 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-4"
           style={{
-            width: "550px",
-            height: "550px",
+            ...cloudStyle,
+            width: MOBILE ? "275px" : "550px",
+            height: MOBILE ? "275px" : "550px",
             bottom: "-5%",
             left: "50%",
             transform: "translateX(-50%)",
             background:
               "radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.015) 40%, transparent 70%)",
-            filter: "blur(100px)",
+            filter: MOBILE ? "blur(50px)" : "blur(100px)",
             borderRadius: "50%",
           }}
         />
@@ -581,37 +613,41 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-5"
           style={{
-            width: "400px",
-            height: "400px",
+            ...cloudStyle,
+            width: MOBILE ? "200px" : "400px",
+            height: MOBILE ? "200px" : "400px",
             bottom: "20%",
             left: "-5%",
             background:
               "radial-gradient(circle, rgba(129, 140, 248, 0.05) 0%, transparent 60%)",
-            filter: "blur(80px)",
+            filter: MOBILE ? "blur(40px)" : "blur(80px)",
             borderRadius: "50%",
           }}
         />
       </div>
 
-      {/* Three.js Canvas — rain, stars, nebula shader, shooting stars */}
-      <Canvas
-        camera={{ position: [0, 0, 7], fov: 60 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: false, alpha: true }}
-        style={{
-          background: "transparent",
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "auto",
-        }}
-      >
-        <NebulaMesh />
-        <Rain />
-        <RainStreaks />
-        <Stars />
-        <BrightStars />
-        <ShootingStars />
-      </Canvas>
+      {/* Three.js Canvas — deferred to avoid blocking initial paint */}
+      {canvasReady && (
+        <Canvas
+          camera={{ position: [0, 0, 7], fov: 60 }}
+          dpr={MOBILE ? [1, 1] : [1, 1.5]}
+          gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
+          style={{
+            background: "transparent",
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "auto",
+          }}
+          frameloop="always"
+        >
+          <NebulaMesh />
+          <Rain />
+          <RainStreaks />
+          <Stars />
+          <BrightStars />
+          {!MOBILE && <ShootingStars />}
+        </Canvas>
+      )}
 
       {/* Dot grid overlay — techy vibe */}
       <div

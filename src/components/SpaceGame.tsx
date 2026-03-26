@@ -35,8 +35,16 @@ interface Particle {
   size: number;
 }
 
-export default function SpaceGame() {
-  const [gameOpen, setGameOpen] = useState(false);
+export default function SpaceGame({
+  open,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const gameOpen = open ?? internalOpen;
+  const setGameOpen = onOpenChange ?? setInternalOpen;
   const [gameState, setGameState] = useState<
     "menu" | "playing" | "gameover"
   >("menu");

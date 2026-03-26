@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks } from "@/lib/data";
 
-export default function Navbar() {
+export default function Navbar({ onPlayGame }: { onPlayGame?: () => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -99,23 +99,42 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* CTA button — top right */}
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="hidden md:inline-flex text-white font-medium rounded-full transition-all duration-300 shrink-0 fixed top-4 right-8"
-            style={{
-              padding: "9px 22px",
-              fontSize: "13px",
-              zIndex: 50,
-              background:
-                "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
-              boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)",
-            }}
-          >
-            Let&apos;s Talk
-          </motion.a>
+          {/* Play Game button — top right */}
+          {onPlayGame && (
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={onPlayGame}
+              className="hidden md:inline-flex items-center text-white font-medium rounded-full transition-all duration-300 shrink-0 fixed top-4 right-8"
+              style={{
+                padding: "9px 22px",
+                fontSize: "13px",
+                zIndex: 50,
+                gap: "8px",
+                background:
+                  "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
+                boxShadow: "0 4px 20px rgba(99, 102, 241, 0.3)",
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="2" y="6" width="20" height="12" rx="3" />
+                <line x1="6" y1="10" x2="6" y2="14" />
+                <line x1="4" y1="12" x2="8" y2="12" />
+                <circle cx="16" cy="10" r="1" fill="currentColor" />
+                <circle cx="19" cy="12" r="1" fill="currentColor" />
+              </svg>
+              Play Game
+            </motion.button>
+          )}
 
           {/* Mobile toggle */}
           <button
@@ -206,6 +225,49 @@ export default function Navbar() {
                   </a>
                 </motion.li>
               ))}
+
+              {/* Play Game — mobile menu */}
+              {onPlayGame && (
+                <motion.li
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: navLinks.length * 0.08,
+                    ease: [0.25, 0.1, 0, 1],
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      onPlayGame();
+                    }}
+                    className="flex items-center font-display font-semibold text-accent/70 hover:text-accent transition-colors py-3"
+                    style={{
+                      fontSize: "36px",
+                      letterSpacing: "-0.02em",
+                      gap: "14px",
+                    }}
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="2" y="6" width="20" height="12" rx="3" />
+                      <line x1="6" y1="10" x2="6" y2="14" />
+                      <line x1="4" y1="12" x2="8" y2="12" />
+                      <circle cx="16" cy="10" r="1" fill="currentColor" />
+                      <circle cx="19" cy="12" r="1" fill="currentColor" />
+                    </svg>
+                    Play
+                  </button>
+                </motion.li>
+              )}
             </ul>
           </motion.div>
         )}
