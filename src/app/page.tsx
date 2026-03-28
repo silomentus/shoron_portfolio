@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <>
       <SpaceBackground />
-      {deferred && <CustomCursor />}
+      {/* {deferred && <CustomCursor />} */}
       <ScrollProgress />
       <Navbar onPlayGame={handlePlayGame} />
       <main className="relative z-[1]">
