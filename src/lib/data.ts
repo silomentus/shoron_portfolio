@@ -7,7 +7,7 @@ export const personalInfo = {
     "I am a Computer Science graduate from North South University currently working as a Junior Software Engineer. My work focuses on backend development, API design, and building reliable, scalable software solutions.",
   socials: {
     github: "https://github.com/silomentus",
-    linkedin: "www.linkedin.com/in/md-harun-or-rashid-shoron",
+    linkedin: "https://www.linkedin.com/in/md-harun-or-rashid-shoron/",
     facebook: "https://facebook.com/shoronhr", 
     instagram: "https://instagram.com/shoronhr", 
   },
