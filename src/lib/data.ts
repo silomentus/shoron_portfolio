@@ -23,10 +23,7 @@ export const experience = [
     department: "Web Development",
     duration: "Jul 2025 - Present",
     description:
-      "Appinion is a software development company and a sister concern of Sajida Foundation , providing technology solutions for financial services and enterprise operations.",
-    descriptionLinks: {
-      "Sajida Foundation": "https://www.sajida.org/",
-    },
+      "Appinion BD LTD is a software development company, providing technology solutions for financial services and enterprise operations.",
     responsibilities: [
       "Build and maintain backend services in PHP (Laravel) and MySQL across multiple production systems, following MVC architecture and REST API conventions",
       "Deliver backend modules across fintech, non-profit/NGO, and microfinance sectors, including loan generation and lifecycle management, a Microfinance Management System for field-level disbursement and collection, and credit-evaluation workflows used by field officers in production",
