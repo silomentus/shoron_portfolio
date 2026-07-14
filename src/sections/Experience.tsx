@@ -116,33 +116,7 @@ export default function Experience() {
                       marginBottom: "28px",
                     }}
                   >
-                    {exp.descriptionLinks
-                      ? (() => {
-                          const links = exp.descriptionLinks as Record<string, string>;
-                          return exp.description
-                            .split(
-                              new RegExp(
-                                `(${Object.keys(links).join("|")})`
-                              )
-                            )
-                            .map((part, i) =>
-                              links[part] ? (
-                                <a
-                                  key={i}
-                                  href={links[part]}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-accent/80 hover:text-accent transition-colors duration-300"
-                                  style={{ textDecoration: "underline" }}
-                                >
-                                  {part}
-                                </a>
-                              ) : (
-                                <span key={i}>{part}</span>
-                              )
-                            );
-                        })()
-                      : exp.description}
+                    {exp.description}
                   </p>
 
                   {/* Responsibilities */}
