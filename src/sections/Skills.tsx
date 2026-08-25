@@ -10,18 +10,19 @@ import {
   DiJava,
   DiHtml5,
   DiCss3,
+  DiDatabase,
 } from "react-icons/di";
-import { SiLaravel, SiCplusplus, SiTypescript } from "react-icons/si";
+import { SiCplusplus, SiTypescript } from "react-icons/si";
 import { IconType } from "react-icons";
 
 const iconMap: Record<string, IconType> = {
   php: DiPhp,
-  laravel: SiLaravel,
   python: DiPython,
   javascript: DiJavascript1,
+  typescript: SiTypescript,
   java: DiJava,
   cplusplus: SiCplusplus,
-  typescript: SiTypescript,
+  sql: DiDatabase,
   html5: DiHtml5,
   css3: DiCss3,
 };

@@ -120,27 +120,48 @@ export default function Hero() {
         animate="visible"
         className="relative z-10 text-center px-6 max-w-4xl mx-auto"
       >
-        {/* Status badge */}
+        {/* Custom Status Chip */}
         <motion.div
           variants={itemVariants}
-          className="inline-flex items-center rounded-full backdrop-blur-md"
+          className="inline-flex items-center backdrop-blur-xl transition-all duration-300 hover:border-accent/40"
           style={{
-            gap: "8px",
-            padding: "7px 16px",
+            gap: "10px",
+            padding: "6px 16px",
             marginBottom: "32px",
-            border: "1px solid rgba(26, 26, 37, 0.8)",
-            background: "rgba(17, 17, 24, 0.5)",
+            borderRadius: "999px",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "rgba(17, 17, 24, 0.65)",
+            boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)",
           }}
         >
+          <span className="relative flex" style={{ width: "7px", height: "7px" }}>
+            <span
+              className="animate-ping absolute inline-flex rounded-full bg-emerald-400 opacity-75"
+              style={{ width: "100%", height: "100%" }}
+            />
+            <span
+              className="relative inline-flex rounded-full bg-emerald-400"
+              style={{ width: "7px", height: "7px", boxShadow: "0 0 8px rgba(52, 211, 153, 0.8)" }}
+            />
+          </span>
           <span
-            className="rounded-full bg-emerald-400 animate-pulse shrink-0"
-            style={{ width: "6px", height: "6px" }}
+            className="font-mono text-emerald-400 font-medium tracking-wider uppercase"
+            style={{ fontSize: "11px" }}
+          >
+            Available
+          </span>
+          <span
+            style={{
+              width: "1px",
+              height: "12px",
+              background: "rgba(255, 255, 255, 0.12)",
+            }}
           />
           <span
             className="text-text-muted font-mono"
-            style={{ fontSize: "12px", letterSpacing: "0.02em" }}
+            style={{ fontSize: "12px", letterSpacing: "0.01em" }}
           >
-            Open to meaningful opportunities
+            Backend Engineer @ Appinion BD
           </span>
         </motion.div>
 
@@ -193,14 +214,11 @@ export default function Hero() {
         >
           <TypeWriter
             words={[
-              "Software Engineer",
-              "Backend Developer",
-              "AI/ML Enthusiast",
-              "Problem Solver",
-              "Bug Creator & Fixer",
-              "Deadline Speedrunner",
-              "Code Poet",
-              "Overengineering Specialist",
+              "Backend Software Engineer",
+              "Laravel & PHP Specialist",
+              "Applied AI / ML Enthusiast",
+              "System Architecture & API Design",
+              "Clean Code Advocate",
             ]}
           />
         </motion.div>
@@ -211,14 +229,68 @@ export default function Hero() {
           className="text-text-muted max-w-xl mx-auto leading-relaxed"
           style={{
             fontSize: "16px",
-            marginTop: "28px",
-            marginBottom: "44px",
+            marginTop: "24px",
+            marginBottom: "32px",
             lineHeight: 1.8,
           }}
         >
           Building scalable backend systems and exploring the frontiers of AI.
-          Currently crafting enterprise solutions.
+          Currently crafting enterprise solutions at Appinion BD.
         </motion.p>
+
+        {/* CTA Action Buttons */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-wrap items-center justify-center"
+          style={{ gap: "14px", marginBottom: "36px" }}
+        >
+          <motion.a
+            href="#projects"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            className="inline-flex items-center font-mono font-medium text-white rounded-full transition-all duration-300"
+            style={{
+              padding: "12px 28px",
+              fontSize: "13px",
+              background:
+                "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
+              boxShadow: "0 4px 24px rgba(99, 102, 241, 0.35)",
+              gap: "8px",
+              textDecoration: "none",
+            }}
+          >
+            <span>Explore Work</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M7 17L17 7M17 7H7M17 7V17" />
+            </svg>
+          </motion.a>
+
+          <motion.a
+            href="#contact"
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            className="inline-flex items-center font-mono font-medium text-text-muted hover:text-text rounded-full backdrop-blur-xl transition-all duration-300"
+            style={{
+              padding: "12px 28px",
+              fontSize: "13px",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              gap: "8px",
+              textDecoration: "none",
+            }}
+          >
+            <span>Get in Touch</span>
+          </motion.a>
+        </motion.div>
 
         {/* Rotating tagline */}
         <motion.div

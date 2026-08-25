@@ -1,281 +1,332 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback, memo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 /* ═══════════════════════════════════════════
-   DEVICE DETECTION — reduce work on mobile
+   DEVICE TIER DETECTION
    ═══════════════════════════════════════════ */
-function isMobile() {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent);
+export type PerfTier = "ultra-low" | "low" | "medium" | "high";
+
+function detectInitialTier(): PerfTier {
+  if (typeof window === "undefined") return "low";
+
+  // Check prefers-reduced-motion
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return "ultra-low";
+  }
+
+  const isMobileDevice =
+    window.innerWidth < 768 ||
+    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const cores = navigator.hardwareConcurrency || 4;
+  // @ts-ignore
+  const memory = navigator.deviceMemory || 4;
+
+  if (cores <= 2 || memory <= 2) {
+    return "ultra-low";
+  }
+
+  if (isMobileDevice || cores <= 4 || memory <= 4 || window.innerWidth < 1024) {
+    return "low";
+  }
+
+  return "high";
 }
 
-const MOBILE = typeof window !== "undefined" && isMobile();
-
 /* ═══════════════════════════════════════════
-   RAIN — diagonal streaks with subtle glow
+   GPU RAIN — 100% Vertex Shader Driven
+   (Zero CPU loops, Zero buffer re-uploads)
    ═══════════════════════════════════════════ */
-const RAIN_COUNT = MOBILE ? 200 : 800;
+interface GPURainProps {
+  count: number;
+}
 
-function Rain() {
-  const meshRef = useRef<THREE.Points>(null);
+const GPURain = memo(function GPURain({ count }: GPURainProps) {
+  const [positions, speeds, opacities, sizes] = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const spd = new Float32Array(count);
+    const opa = new Float32Array(count);
+    const sz = new Float32Array(count);
 
-  const [positions, velocities, opacities] = useMemo(() => {
-    const pos = new Float32Array(RAIN_COUNT * 3);
-    const vel = new Float32Array(RAIN_COUNT);
-    const opa = new Float32Array(RAIN_COUNT);
-    for (let i = 0; i < RAIN_COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      pos[i3] = (Math.random() - 0.5) * 30;
+      pos[i3] = (Math.random() - 0.5) * 32;
       pos[i3 + 1] = Math.random() * 20 - 10;
       pos[i3 + 2] = (Math.random() - 0.5) * 12;
-      vel[i] = 0.025 + Math.random() * 0.04;
-      opa[i] = 0.15 + Math.random() * 0.35;
+      spd[i] = 1.8 + Math.random() * 2.5;
+      opa[i] = 0.4 + Math.random() * 0.45;
+      sz[i] = 0.045 + Math.random() * 0.025;
     }
-    return [pos, vel, opa];
+    return [pos, spd, opa, sz];
+  }, [count]);
+
+  const material = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color("#8b9cf8") },
+      },
+      vertexShader: `
+        uniform float uTime;
+        attribute float aSpeed;
+        attribute float aOpacity;
+        attribute float aSize;
+        varying float vOpacity;
+
+        void main() {
+          vOpacity = aOpacity;
+          
+          float totalHeight = 20.0;
+          float dist = uTime * aSpeed;
+          float y = mod(position.y - dist + 10.0, totalHeight) - 10.0;
+          float progress = (10.0 - y) / totalHeight;
+          float x = position.x - progress * 3.0;
+
+          vec3 pos = vec3(x, y, position.z);
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          gl_PointSize = aSize * (500.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying float vOpacity;
+        uniform vec3 uColor;
+
+        void main() {
+          vec2 coord = gl_PointCoord - vec2(0.5);
+          float dist = length(coord);
+          if (dist > 0.5) discard;
+          float alpha = smoothstep(0.5, 0.05, dist) * vOpacity;
+          gl_FragColor = vec4(uColor, alpha);
+        }
+      `,
+    });
   }, []);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const posArray = meshRef.current.geometry.attributes.position
-      .array as Float32Array;
-
-    for (let i = 0; i < RAIN_COUNT; i++) {
-      const i3 = i * 3;
-      posArray[i3 + 1] -= velocities[i];
-      posArray[i3] -= velocities[i] * 0.15; // diagonal
-
-      if (posArray[i3 + 1] < -10) {
-        posArray[i3 + 1] = 10;
-        posArray[i3] = (Math.random() - 0.5) * 30;
-        posArray[i3 + 2] = (Math.random() - 0.5) * 12;
-      }
-    }
-
-    meshRef.current.geometry.attributes.position.needsUpdate = true;
+  useFrame((state) => {
+    material.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
-  const posAttr = useMemo(
-    () => new THREE.BufferAttribute(positions, 3),
-    [positions]
-  );
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    g.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+    g.setAttribute("aOpacity", new THREE.BufferAttribute(opacities, 1));
+    g.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+    return g;
+  }, [positions, speeds, opacities, sizes]);
 
-  return (
-    <points ref={meshRef}>
-      <bufferGeometry>
-        <primitive attach="attributes-position" object={posAttr} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.022}
-        color="#8b9cf8"
-        transparent
-        opacity={0.45}
-        sizeAttenuation
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </points>
-  );
-}
+  return <points geometry={geo} material={material} />;
+});
 
 /* ═══════════════════════════════════════════
-   RAIN STREAKS — elongated lines for rain feel
+   GPU RAIN STREAKS — Vertex Shader Line Segments
    ═══════════════════════════════════════════ */
-const STREAK_COUNT = MOBILE ? 80 : 300;
+interface GPURainStreaksProps {
+  count: number;
+}
 
-function RainStreaks() {
-  const meshRef = useRef<THREE.LineSegments>(null);
+const GPURainStreaks = memo(function GPURainStreaks({ count }: GPURainStreaksProps) {
+  const [positions, speeds, lengths, isEnds, opacities] = useMemo(() => {
+    const totalVerts = count * 2;
+    const pos = new Float32Array(totalVerts * 3);
+    const spd = new Float32Array(totalVerts);
+    const len = new Float32Array(totalVerts);
+    const isEnd = new Float32Array(totalVerts);
+    const opa = new Float32Array(totalVerts);
 
-  const [positions, velocities] = useMemo(() => {
-    const pos = new Float32Array(STREAK_COUNT * 6); // 2 points per line
-    const vel = new Float32Array(STREAK_COUNT);
-    for (let i = 0; i < STREAK_COUNT; i++) {
-      const i6 = i * 6;
-      const x = (Math.random() - 0.5) * 28;
+    for (let i = 0; i < count; i++) {
+      const x = (Math.random() - 0.5) * 30;
       const y = Math.random() * 20 - 10;
       const z = (Math.random() - 0.5) * 10;
-      const streakLen = 0.15 + Math.random() * 0.25;
+      const streakSpeed = 2.8 + Math.random() * 3.5;
+      const streakLen = 0.2 + Math.random() * 0.3;
+      const streakOpa = 0.25 + Math.random() * 0.25;
 
-      // Start point
-      pos[i6] = x;
-      pos[i6 + 1] = y;
-      pos[i6 + 2] = z;
-      // End point — offset up-right for diagonal rain
-      pos[i6 + 3] = x + streakLen * 0.15;
-      pos[i6 + 4] = y + streakLen;
-      pos[i6 + 5] = z;
+      // Vertex 1: Start
+      const v1 = i * 2;
+      pos[v1 * 3] = x;
+      pos[v1 * 3 + 1] = y;
+      pos[v1 * 3 + 2] = z;
+      spd[v1] = streakSpeed;
+      len[v1] = streakLen;
+      isEnd[v1] = 0.0;
+      opa[v1] = streakOpa * 0.4;
 
-      vel[i] = 0.04 + Math.random() * 0.06;
+      // Vertex 2: End
+      const v2 = i * 2 + 1;
+      pos[v2 * 3] = x;
+      pos[v2 * 3 + 1] = y;
+      pos[v2 * 3 + 2] = z;
+      spd[v2] = streakSpeed;
+      len[v2] = streakLen;
+      isEnd[v2] = 1.0;
+      opa[v2] = streakOpa;
     }
-    return [pos, vel];
-  }, []);
+    return [pos, spd, len, isEnd, opa];
+  }, [count]);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const posArray = meshRef.current.geometry.attributes.position
-      .array as Float32Array;
+  const material = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color("#8b9cf8") },
+      },
+      vertexShader: `
+        uniform float uTime;
+        attribute float aSpeed;
+        attribute float aLen;
+        attribute float aIsEnd;
+        attribute float aOpacity;
+        varying float vOpacity;
 
-    for (let i = 0; i < STREAK_COUNT; i++) {
-      const i6 = i * 6;
-      const speed = velocities[i];
+        void main() {
+          vOpacity = aOpacity;
+          
+          float totalHeight = 22.0;
+          float dist = uTime * aSpeed;
+          float y = mod(position.y - dist + 11.0, totalHeight) - 11.0;
+          float progress = (11.0 - y) / totalHeight;
+          float x = position.x - progress * 3.3;
 
-      posArray[i6 + 1] -= speed;
-      posArray[i6 + 4] -= speed;
-      posArray[i6] -= speed * 0.15;
-      posArray[i6 + 3] -= speed * 0.15;
+          if (aIsEnd > 0.5) {
+            x += aLen * 0.15;
+            y += aLen;
+          }
 
-      if (posArray[i6 + 1] < -10) {
-        const x = (Math.random() - 0.5) * 28;
-        const y = 10 + Math.random() * 2;
-        const z = (Math.random() - 0.5) * 10;
-        const len = 0.15 + Math.random() * 0.25;
+          vec3 pos = vec3(x, y, position.z);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying float vOpacity;
+        uniform vec3 uColor;
 
-        posArray[i6] = x;
-        posArray[i6 + 1] = y;
-        posArray[i6 + 2] = z;
-        posArray[i6 + 3] = x + len * 0.15;
-        posArray[i6 + 4] = y + len;
-        posArray[i6 + 5] = z;
-      }
-    }
-
-    meshRef.current.geometry.attributes.position.needsUpdate = true;
-  });
-
-  const posAttr = useMemo(
-    () => new THREE.BufferAttribute(positions, 3),
-    [positions]
-  );
-
-  return (
-    <lineSegments ref={meshRef}>
-      <bufferGeometry>
-        <primitive attach="attributes-position" object={posAttr} />
-      </bufferGeometry>
-      <lineBasicMaterial
-        color="#8b9cf8"
-        transparent
-        opacity={0.18}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </lineSegments>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   STARS — twinkling space dust
-   ═══════════════════════════════════════════ */
-const STAR_COUNT = MOBILE ? 80 : 250;
-
-function Stars() {
-  const meshRef = useRef<THREE.Points>(null);
-  const phases = useRef<Float32Array>(null);
-
-  const positions = useMemo(() => {
-    const pos = new Float32Array(STAR_COUNT * 3);
-    const ph = new Float32Array(STAR_COUNT);
-    for (let i = 0; i < STAR_COUNT; i++) {
-      const i3 = i * 3;
-      pos[i3] = (Math.random() - 0.5) * 28;
-      pos[i3 + 1] = (Math.random() - 0.5) * 18;
-      pos[i3 + 2] = (Math.random() - 0.5) * 8 - 3;
-      ph[i] = Math.random() * Math.PI * 2;
-    }
-    phases.current = ph;
-    return pos;
+        void main() {
+          gl_FragColor = vec4(uColor, vOpacity);
+        }
+      `,
+    });
   }, []);
 
   useFrame((state) => {
-    if (!meshRef.current || !phases.current) return;
-    const t = state.clock.elapsedTime;
-    const mat = meshRef.current.material as THREE.PointsMaterial;
-    // Gentle global twinkle
-    mat.opacity = 0.35 + Math.sin(t * 0.5) * 0.1;
+    material.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
-  const posAttr = useMemo(
-    () => new THREE.BufferAttribute(positions, 3),
-    [positions]
-  );
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    g.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+    g.setAttribute("aLen", new THREE.BufferAttribute(lengths, 1));
+    g.setAttribute("aIsEnd", new THREE.BufferAttribute(isEnds, 1));
+    g.setAttribute("aOpacity", new THREE.BufferAttribute(opacities, 1));
+    return g;
+  }, [positions, speeds, lengths, isEnds, opacities]);
 
-  return (
-    <points ref={meshRef}>
-      <bufferGeometry>
-        <primitive attach="attributes-position" object={posAttr} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.03}
-        color="#c7d2fe"
-        transparent
-        opacity={0.4}
-        sizeAttenuation
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </points>
-  );
-}
+  return <lineSegments geometry={geo} material={material} />;
+});
 
 /* ═══════════════════════════════════════════
-   BRIGHT STARS — larger, pulsing accent stars
+   GPU STARS — Twinkling Stars in 1 Draw Call
    ═══════════════════════════════════════════ */
-const BRIGHT_COUNT = MOBILE ? 8 : 20;
+interface GPUStarsProps {
+  count: number;
+}
 
-function BrightStars() {
-  const meshRef = useRef<THREE.Points>(null);
-  const phasesRef = useRef<Float32Array>(null);
+const GPUStars = memo(function GPUStars({ count }: GPUStarsProps) {
+  const [positions, phases, sizes, opacities] = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const ph = new Float32Array(count);
+    const sz = new Float32Array(count);
+    const opa = new Float32Array(count);
 
-  const positions = useMemo(() => {
-    const pos = new Float32Array(BRIGHT_COUNT * 3);
-    const ph = new Float32Array(BRIGHT_COUNT);
-    for (let i = 0; i < BRIGHT_COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      pos[i3] = (Math.random() - 0.5) * 24;
-      pos[i3 + 1] = (Math.random() - 0.5) * 16;
-      pos[i3 + 2] = (Math.random() - 0.5) * 4 - 2;
+      pos[i3] = (Math.random() - 0.5) * 30;
+      pos[i3 + 1] = (Math.random() - 0.5) * 20;
+      pos[i3 + 2] = (Math.random() - 0.5) * 8 - 2;
       ph[i] = Math.random() * Math.PI * 2;
+
+      // 12% are larger accent bright stars
+      const isBright = i < count * 0.12;
+      sz[i] = isBright ? 0.08 : 0.038 + Math.random() * 0.02;
+      opa[i] = isBright ? 0.75 : 0.4 + Math.random() * 0.3;
     }
-    phasesRef.current = ph;
-    return pos;
+    return [pos, ph, sz, opa];
+  }, [count]);
+
+  const material = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color("#c7d2fe") },
+      },
+      vertexShader: `
+        uniform float uTime;
+        attribute float aPhase;
+        attribute float aSize;
+        attribute float aOpacity;
+        varying float vOpacity;
+
+        void main() {
+          float twinkle = aOpacity * (0.65 + 0.35 * sin(uTime * 1.0 + aPhase));
+          vOpacity = twinkle;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (500.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying float vOpacity;
+        uniform vec3 uColor;
+
+        void main() {
+          vec2 coord = gl_PointCoord - vec2(0.5);
+          float dist = length(coord);
+          if (dist > 0.5) discard;
+          float alpha = smoothstep(0.5, 0.05, dist) * vOpacity;
+          gl_FragColor = vec4(uColor, alpha);
+        }
+      `,
+    });
   }, []);
 
   useFrame((state) => {
-    if (!meshRef.current || !phasesRef.current) return;
-    const t = state.clock.elapsedTime;
-    const mat = meshRef.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.3 + Math.sin(t * 0.8) * 0.15;
+    material.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
-  const posAttr = useMemo(
-    () => new THREE.BufferAttribute(positions, 3),
-    [positions]
-  );
+  const geo = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    g.setAttribute("aPhase", new THREE.BufferAttribute(phases, 1));
+    g.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+    g.setAttribute("aOpacity", new THREE.BufferAttribute(opacities, 1));
+    return g;
+  }, [positions, phases, sizes, opacities]);
 
-  return (
-    <points ref={meshRef}>
-      <bufferGeometry>
-        <primitive attach="attributes-position" object={posAttr} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.06}
-        color="#a5b4fc"
-        transparent
-        opacity={0.35}
-        sizeAttenuation
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </points>
-  );
-}
+  return <points geometry={geo} material={material} />;
+});
 
 /* ═══════════════════════════════════════════
-   NEBULA SMOKE — animated shader fog
+   LIGHTWEIGHT NEBULA SMOKE SHADER
+   (Optimized 2-octave smooth domain warp)
    ═══════════════════════════════════════════ */
-function NebulaMesh() {
+const NebulaMesh = memo(function NebulaMesh() {
   const meshRef = useRef<THREE.Mesh>(null);
   const mouse = useRef({ x: 0, y: 0 });
   const { viewport } = useThree();
@@ -291,7 +342,7 @@ function NebulaMesh() {
   );
 
   useEffect(() => {
-    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
     return () => window.removeEventListener("pointermove", handlePointerMove);
   }, [handlePointerMove]);
 
@@ -316,78 +367,51 @@ function NebulaMesh() {
         uniform vec2 uMouse;
         varying vec2 vUv;
 
-        // Simplex-ish noise
-        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec3 permute(vec3 x) { return mod289(((x * 34.0) + 1.0) * x); }
-
-        float snoise(vec2 v) {
-          const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-                             -0.577350269189626, 0.024390243902439);
-          vec2 i  = floor(v + dot(v, C.yy));
-          vec2 x0 = v - i + dot(i, C.xx);
-          vec2 i1;
-          i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-          vec4 x12 = x0.xyxy + C.xxzz;
-          x12.xy -= i1;
-          i = mod289(i);
-          vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
-          vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
-          m = m * m;
-          m = m * m;
-          vec3 x = 2.0 * fract(p * C.www) - 1.0;
-          vec3 h = abs(x) - 0.5;
-          vec3 ox = floor(x + 0.5);
-          vec3 a0 = x - ox;
-          m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-          vec3 g;
-          g.x = a0.x * x0.x + h.x * x0.y;
-          g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-          return 130.0 * dot(m, g);
+        // Ultra-fast smooth 2D noise
+        float hash(vec2 p) {
+          p = fract(p * vec2(123.34, 456.21));
+          p += dot(p, p + 45.32);
+          return fract(p.x * p.y);
         }
 
-        float fbm(vec2 p) {
-          float value = 0.0;
-          float amp = 0.5;
-          float freq = 1.0;
-          for (int i = 0; i < ${MOBILE ? 3 : 5}; i++) {
-            value += amp * snoise(p * freq);
-            freq *= 2.0;
-            amp *= 0.5;
-          }
-          return value;
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+            mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+            u.y
+          );
+        }
+
+        float fbm2(vec2 p) {
+          return noise(p) * 0.65 + noise(p * 2.05 + 1.2) * 0.35;
         }
 
         void main() {
           vec2 uv = vUv;
-
-          // Smoke layers
-          float t = uTime * 0.08;
-          float smoke1 = fbm(uv * 2.0 + vec2(t * 0.5, t * 0.3));
-          float smoke2 = fbm(uv * 3.0 + vec2(-t * 0.4, t * 0.6) + 5.0);
-          float smoke3 = fbm(uv * 1.5 + vec2(t * 0.2, -t * 0.4) + 10.0);
-
-          // Mouse influence — subtle push
+          float t = uTime * 0.05;
+          
           float mouseDist = length(uv - (uMouse * 0.5 + 0.5));
-          float mouseInfluence = smoothstep(0.5, 0.0, mouseDist) * 0.15;
+          float mouseInfluence = smoothstep(0.5, 0.0, mouseDist) * 0.10;
 
-          float smoke = smoke1 * 0.5 + smoke2 * 0.3 + smoke3 * 0.2 + mouseInfluence;
-          smoke = smoothstep(-0.2, 0.8, smoke);
+          // Single domain warp — ultra fast & smooth
+          vec2 q = vec2(fbm2(uv * 1.8 + vec2(t * 0.4, t * 0.2)), fbm2(uv * 1.8 + vec2(-t * 0.3, t * 0.5)));
+          float smoke = fbm2(uv * 2.2 + q * 1.2) + mouseInfluence;
+          smoke = smoothstep(0.12, 0.82, smoke);
 
-          // Color — indigo / violet / deep blue
           vec3 col1 = vec3(0.30, 0.33, 0.95); // indigo
           vec3 col2 = vec3(0.45, 0.30, 0.85); // violet
           vec3 col3 = vec3(0.15, 0.18, 0.50); // deep blue
 
           vec3 color = mix(col3, col1, smoke);
-          color = mix(color, col2, smoke2 * 0.4);
+          color = mix(color, col2, q.x * 0.35);
 
-          // Fade edges
-          float edgeFade = smoothstep(0.0, 0.3, uv.x) * smoothstep(1.0, 0.7, uv.x)
+          float edgeFade = smoothstep(0.0, 0.25, uv.x) * smoothstep(1.0, 0.75, uv.x)
                          * smoothstep(0.0, 0.2, uv.y) * smoothstep(1.0, 0.8, uv.y);
 
-          float alpha = smoke * 0.06 * edgeFade;
-
+          float alpha = smoke * 0.055 * edgeFade;
           gl_FragColor = vec4(color, alpha);
         }
       `,
@@ -408,38 +432,41 @@ function NebulaMesh() {
       <planeGeometry args={[20, 14]} />
     </mesh>
   );
-}
+});
 
 /* ═══════════════════════════════════════════
-   SHOOTING STARS — occasional fast streaks
+   SHOOTING STARS
    ═══════════════════════════════════════════ */
-const MAX_SHOOTING = MOBILE ? 2 : 6;
+interface ShootingStarsProps {
+  maxCount: number;
+}
 
-function ShootingStars() {
+const ShootingStars = memo(function ShootingStars({ maxCount }: ShootingStarsProps) {
   const groupRef = useRef<THREE.Group>(null);
 
   const stars = useMemo(() => {
-    return Array.from({ length: MAX_SHOOTING }, () => ({
+    return Array.from({ length: maxCount }, () => ({
       positions: new Float32Array(6),
       active: false,
-      timer: Math.random() * 4 + 1, // random initial delay
+      timer: Math.random() * 5 + 1.5,
       life: 0,
       maxLife: 0.8 + Math.random() * 0.4,
-      speed: 0.3 + Math.random() * 0.2,
-      angle: (-Math.PI / 6) + Math.random() * 0.3,
+      speed: 15 + Math.random() * 10,
+      angle: -Math.PI / 5 + Math.random() * 0.4,
       startX: 0,
       startY: 0,
     }));
-  }, []);
+  }, [maxCount]);
 
   const lineRefs = useRef<(THREE.LineSegments | null)[]>([]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.1);
+
     stars.forEach((star, idx) => {
       if (!star.active) {
-        star.timer -= delta;
+        star.timer -= dt;
         if (star.timer <= 0) {
-          // Activate
           star.active = true;
           star.life = 0;
           star.startX = (Math.random() - 0.3) * 20;
@@ -451,11 +478,10 @@ function ShootingStars() {
         return;
       }
 
-      star.life += delta;
+      star.life += dt;
       if (star.life >= star.maxLife) {
         star.active = false;
-        star.timer = 3 + Math.random() * 6; // next interval
-        // Hide
+        star.timer = 4 + Math.random() * 7;
         const line = lineRefs.current[idx];
         if (line) {
           const mat = line.material as THREE.LineBasicMaterial;
@@ -471,7 +497,7 @@ function ShootingStars() {
 
       const headX = star.startX + dx;
       const headY = star.startY + dy;
-      const tailLen = 2.5;
+      const tailLen = 2.2;
       const tailX = headX - Math.cos(star.angle) * tailLen;
       const tailY = headY - Math.sin(star.angle) * tailLen;
 
@@ -487,11 +513,9 @@ function ShootingStars() {
         line.geometry.attributes.position.needsUpdate = true;
 
         const mat = line.material as THREE.LineBasicMaterial;
-        // Fade in then out
-        const fade = progress < 0.2
-          ? progress / 0.2
-          : 1 - (progress - 0.2) / 0.8;
-        mat.opacity = fade * 0.7;
+        const fade =
+          progress < 0.2 ? progress / 0.2 : 1 - (progress - 0.2) / 0.8;
+        mat.opacity = fade * 0.6;
       }
     });
   });
@@ -501,7 +525,9 @@ function ShootingStars() {
       {stars.map((_, idx) => (
         <lineSegments
           key={idx}
-          ref={(el) => { lineRefs.current[idx] = el; }}
+          ref={(el) => {
+            lineRefs.current[idx] = el;
+          }}
         >
           <bufferGeometry>
             <bufferAttribute
@@ -520,36 +546,111 @@ function ShootingStars() {
       ))}
     </group>
   );
+});
+
+/* ═══════════════════════════════════════════
+   FPS MONITOR & AUTO-DEGRADE SAFEGUARD
+   ═══════════════════════════════════════════ */
+function DynamicPerformanceMonitor({
+  onDegrade,
+}: {
+  onDegrade: () => void;
+}) {
+  const frameCount = useRef(0);
+  const lastTime = useRef(performance.now());
+  const lowFpsCount = useRef(0);
+
+  useFrame(() => {
+    frameCount.current++;
+    const now = performance.now();
+    const elapsed = now - lastTime.current;
+
+    // Check FPS every 1 second
+    if (elapsed >= 1000) {
+      const fps = (frameCount.current * 1000) / elapsed;
+      frameCount.current = 0;
+      lastTime.current = now;
+
+      if (fps < 38) {
+        lowFpsCount.current++;
+        if (lowFpsCount.current >= 2) {
+          onDegrade();
+          lowFpsCount.current = 0;
+        }
+      } else {
+        lowFpsCount.current = 0;
+      }
+    }
+  });
+
+  return null;
 }
 
 /* ═══════════════════════════════════════════
    MAIN SPACE BACKGROUND COMPONENT
    ═══════════════════════════════════════════ */
 export default function SpaceBackground() {
+  const [tier, setTier] = useState<PerfTier>("medium");
   const [canvasReady, setCanvasReady] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(true);
 
   useEffect(() => {
-    if (MOBILE) return; // No Three.js on mobile — CSS-only background
-    const id = requestAnimationFrame(() => setCanvasReady(true));
-    return () => cancelAnimationFrame(id);
+    const detected = detectInitialTier();
+    setTier(detected);
+
+    const handleVisibility = () => {
+      setIsTabVisible(document.visibilityState === "visible");
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    const timer = setTimeout(() => {
+      setCanvasReady(true);
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
+  const handleDegradeTier = useCallback(() => {
+    setTier((prev) => {
+      if (prev === "high") return "medium";
+      if (prev === "medium") return "low";
+      if (prev === "low") return "ultra-low";
+      return "ultra-low";
+    });
+  }, []);
+
+  const isUltraLow = tier === "ultra-low";
+  const isLow = tier === "low" || isUltraLow;
+  const isMed = tier === "medium";
+
+  const rainCount = isUltraLow ? 180 : isLow ? 280 : isMed ? 450 : 750;
+  const streakCount = isUltraLow ? 40 : isLow ? 80 : isMed ? 130 : 220;
+  const starCount = isUltraLow ? 80 : isLow ? 120 : isMed ? 180 : 260;
+  const shootingStarsCount = isUltraLow ? 1 : isLow ? 2 : isMed ? 4 : 5;
+  const showNebulaShader = !isLow;
+
+  const maxDpr = isLow ? 1 : isMed ? 1 : 1.25;
+
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* CSS Smoke Clouds */}
+    <div
+      className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      style={{ contain: "strict" }}
+    >
+      {/* CSS Smooth Radial Clouds */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Cloud 1 — top left, indigo */}
         <div
           className="absolute smoke-cloud-1"
           style={{
-            width: MOBILE ? "300px" : "600px",
-            height: MOBILE ? "300px" : "600px",
+            width: isLow ? "320px" : "550px",
+            height: isLow ? "320px" : "550px",
             top: "-10%",
             left: "-5%",
-            background: MOBILE
-              ? "radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.03) 40%, transparent 70%)"
-              : "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.02) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(30px)" : "blur(80px)",
+            background:
+              "radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.04) 35%, rgba(99, 102, 241, 0.01) 60%, transparent 75%)",
             borderRadius: "50%",
           }}
         />
@@ -557,73 +658,58 @@ export default function SpaceBackground() {
         <div
           className="absolute smoke-cloud-2"
           style={{
-            width: MOBILE ? "250px" : "500px",
-            height: MOBILE ? "250px" : "500px",
+            width: isLow ? "280px" : "480px",
+            height: isLow ? "280px" : "480px",
             top: "20%",
             right: "-8%",
-            background: MOBILE
-              ? "radial-gradient(circle, rgba(139, 92, 246, 0.10) 0%, rgba(139, 92, 246, 0.02) 40%, transparent 70%)"
-              : "radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.015) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(30px)" : "blur(100px)",
+            background:
+              "radial-gradient(circle, rgba(139, 92, 246, 0.07) 0%, rgba(139, 92, 246, 0.035) 35%, rgba(139, 92, 246, 0.01) 60%, transparent 75%)",
             borderRadius: "50%",
           }}
         />
-        {/* Cloud 3 — center, deep blue (desktop only) */}
-        {!MOBILE && (
+        {/* Cloud 3 — center, deep blue */}
+        {!isLow && (
           <div
             className="absolute smoke-cloud-3"
             style={{
-              width: "700px",
-              height: "500px",
+              width: "600px",
+              height: "450px",
               top: "40%",
               left: "20%",
               background:
-                "radial-gradient(ellipse, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.01) 40%, transparent 70%)",
-              filter: "blur(90px)",
+                "radial-gradient(ellipse, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.02) 40%, transparent 75%)",
               borderRadius: "50%",
             }}
           />
         )}
         {/* Cloud 4 — bottom, warm violet */}
         <div
-          className={`absolute ${MOBILE ? "smoke-cloud-3" : "smoke-cloud-4"}`}
+          className={`absolute ${isLow ? "smoke-cloud-3" : "smoke-cloud-4"}`}
           style={{
-            width: MOBILE ? "275px" : "550px",
-            height: MOBILE ? "275px" : "550px",
+            width: isLow ? "300px" : "500px",
+            height: isLow ? "300px" : "500px",
             bottom: "-5%",
             left: "50%",
-            transform: "translateX(-50%)",
-            background: MOBILE
-              ? "radial-gradient(circle, rgba(167, 139, 250, 0.10) 0%, rgba(167, 139, 250, 0.02) 40%, transparent 70%)"
-              : "radial-gradient(circle, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.015) 40%, transparent 70%)",
-            filter: MOBILE ? "blur(30px)" : "blur(100px)",
+            transform: "translate3d(-50%, 0, 0)",
+            background:
+              "radial-gradient(circle, rgba(167, 139, 250, 0.07) 0%, rgba(167, 139, 250, 0.03) 35%, rgba(167, 139, 250, 0.01) 60%, transparent 75%)",
             borderRadius: "50%",
           }}
         />
-        {/* Cloud 5 — bottom left accent (desktop only) */}
-        {!MOBILE && (
-          <div
-            className="absolute smoke-cloud-5"
-            style={{
-              width: "400px",
-              height: "400px",
-              bottom: "20%",
-              left: "-5%",
-              background:
-                "radial-gradient(circle, rgba(129, 140, 248, 0.05) 0%, transparent 60%)",
-              filter: "blur(80px)",
-              borderRadius: "50%",
-            }}
-          />
-        )}
       </div>
 
-      {/* Three.js Canvas — desktop only */}
-      {canvasReady && (
+      {/* Three.js Canvas */}
+      {canvasReady && isTabVisible && (
         <Canvas
           camera={{ position: [0, 0, 7], fov: 60 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: false, alpha: true }}
+          dpr={[1, maxDpr]}
+          gl={{
+            antialias: false,
+            alpha: true,
+            powerPreference: "low-power",
+            depth: false,
+            stencil: false,
+          }}
           style={{
             background: "transparent",
             position: "absolute",
@@ -632,20 +718,20 @@ export default function SpaceBackground() {
           }}
           frameloop="always"
         >
-          <NebulaMesh />
-          <Rain />
-          <RainStreaks />
-          <Stars />
-          <BrightStars />
-          <ShootingStars />
+          <DynamicPerformanceMonitor onDegrade={handleDegradeTier} />
+          {showNebulaShader && <NebulaMesh />}
+          <GPURain count={rainCount} />
+          {streakCount > 0 && <GPURainStreaks count={streakCount} />}
+          <GPUStars count={starCount} />
+          {shootingStarsCount > 0 && (
+            <ShootingStars maxCount={shootingStarsCount} />
+          )}
         </Canvas>
       )}
 
-      {/* Dot grid overlay — techy vibe */}
-      <div
-        className="absolute inset-0 dot-grid"
-        style={{ opacity: 0.5 }}
-      />
+      {/* Dot grid overlay */}
+      <div className="absolute inset-0 dot-grid" style={{ opacity: 0.4 }} />
     </div>
   );
 }
+

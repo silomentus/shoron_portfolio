@@ -39,6 +39,19 @@ export default function Contact() {
   const [status, setStatus] = useState<
     "idle" | "sending" | "sent" | "error"
   >("idle");
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const handleCopyEmail = () => {
+    const email = atob("c2lsb21lbnR1c0BnbWFpbC5jb20=");
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2500);
+  };
+
+  const handleOpenMail = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.location.href = "mailto:" + atob("c2lsb21lbnR1c0BnbWFpbC5jb20=");
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -283,31 +296,109 @@ export default function Contact() {
                 </div>
               </motion.div>
 
-              {/* Email */}
-              <motion.a
-                href="mailto:silomentus@gmail.com"
+              {/* Email — Secure Obfuscated Click-to-Copy */}
+              <motion.div
+                onClick={handleCopyEmail}
                 whileHover={{ y: -2 }}
-                className="glass-card-hover group flex items-center"
+                className="glass-card-hover group flex items-center justify-between cursor-pointer"
                 style={{
                   padding: "20px 22px",
                   borderRadius: "14px",
                   gap: "16px",
-                  textDecoration: "none",
                 }}
+                title="Click to copy email address"
               >
-                <div
-                  className="flex items-center justify-center shrink-0"
+                <div className="flex items-center" style={{ gap: "16px" }}>
+                  <div
+                    className="flex items-center justify-center shrink-0"
+                    style={{
+                      width: "42px",
+                      height: "42px",
+                      borderRadius: "11px",
+                      background: copiedEmail
+                        ? "linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.1))"
+                        : "linear-gradient(135deg, rgba(129, 140, 248, 0.12), rgba(167, 139, 250, 0.06))",
+                      border: copiedEmail
+                        ? "1px solid rgba(52, 211, 153, 0.3)"
+                        : "1px solid rgba(129, 140, 248, 0.15)",
+                      transition: "all 0.3s",
+                    }}
+                  >
+                    {copiedEmail ? (
+                      <svg
+                        className="text-emerald-400"
+                        style={{ width: "18px", height: "18px" }}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="text-accent"
+                        style={{ width: "18px", height: "18px" }}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <p
+                      className="text-text-muted/80 font-mono uppercase"
+                      style={{
+                        fontSize: "11px",
+                        letterSpacing: "0.05em",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      Direct Email
+                    </p>
+                    <p
+                      className={`font-mono transition-colors duration-300 ${
+                        copiedEmail
+                          ? "text-emerald-400 font-medium"
+                          : "text-text/80 group-hover:text-accent"
+                      }`}
+                      style={{ fontSize: "13px" }}
+                    >
+                      {copiedEmail
+                        ? "Copied to clipboard! ✓"
+                        : "Click to copy email address"}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleOpenMail}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-text-muted hover:text-accent hidden sm:flex items-center shrink-0"
                   style={{
-                    width: "42px",
-                    height: "42px",
-                    borderRadius: "11px",
-                    background:
-                      "linear-gradient(135deg, rgba(129, 140, 248, 0.12), rgba(167, 139, 250, 0.06))",
+                    padding: "6px 12px",
+                    borderRadius: "8px",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    fontSize: "11px",
+                    gap: "4px",
                   }}
+                  title="Open mail app"
                 >
+                  <span>Open</span>
                   <svg
-                    className="text-accent"
-                    style={{ width: "18px", height: "18px" }}
+                    style={{ width: "11px", height: "11px" }}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -315,30 +406,12 @@ export default function Contact() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      strokeWidth={2}
+                      d="M7 17L17 7M17 7H7M17 7V17"
                     />
                   </svg>
-                </div>
-                <div>
-                  <p
-                    className="text-text-muted/80 font-mono uppercase"
-                    style={{
-                      fontSize: "11px",
-                      letterSpacing: "0.05em",
-                      marginBottom: "3px",
-                    }}
-                  >
-                    Email
-                  </p>
-                  <p
-                    className="text-text/80 group-hover:text-accent transition-colors duration-500"
-                    style={{ fontSize: "14px" }}
-                  >
-                    silomentus@gmail.com
-                  </p>
-                </div>
-              </motion.a>
+                </button>
+              </motion.div>
             </div>
 
             {/* Social buttons */}
@@ -478,6 +551,7 @@ export default function Contact() {
                     onChange={handleChange}
                     placeholder="Your name"
                     style={inputStyle}
+                    className="focus:!border-accent focus:!ring-2 focus:!ring-accent/20 transition-all"
                   />
                 </div>
 
@@ -501,6 +575,7 @@ export default function Contact() {
                     onChange={handleChange}
                     placeholder="your@email.com"
                     style={inputStyle}
+                    className="focus:!border-accent focus:!ring-2 focus:!ring-accent/20 transition-all"
                   />
                 </div>
 
@@ -524,6 +599,7 @@ export default function Contact() {
                     onChange={handleChange}
                     placeholder="What's this about?"
                     style={inputStyle}
+                    className="focus:!border-accent focus:!ring-2 focus:!ring-accent/20 transition-all"
                   />
                 </div>
 
@@ -551,6 +627,7 @@ export default function Contact() {
                       resize: "vertical",
                       minHeight: "120px",
                     }}
+                    className="focus:!border-accent focus:!ring-2 focus:!ring-accent/20 transition-all"
                   />
                 </div>
 

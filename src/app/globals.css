@@ -36,6 +36,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 100px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent-dark) var(--color-bg);
 }
@@ -262,133 +263,90 @@ textarea:focus {
   }
 }
 
-/* ═══ Smoke cloud drift animations ═══ */
+/* ═══ Smoke cloud drift animations (GPU-accelerated translate3d, no expensive scaling on blur) ═══ */
 .smoke-cloud-1,
 .smoke-cloud-2,
 .smoke-cloud-3,
 .smoke-cloud-4,
 .smoke-cloud-5 {
-  will-change: transform, opacity;
+  will-change: transform;
   backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 .smoke-cloud-1 {
-  animation: drift1 25s ease-in-out infinite;
+  animation: drift1 28s ease-in-out infinite;
 }
 .smoke-cloud-2 {
-  animation: drift2 30s ease-in-out infinite;
+  animation: drift2 34s ease-in-out infinite;
 }
 .smoke-cloud-3 {
-  animation: drift3 35s ease-in-out infinite;
+  animation: drift3 38s ease-in-out infinite;
 }
 .smoke-cloud-4 {
-  animation: drift4 28s ease-in-out infinite;
+  animation: drift4 30s ease-in-out infinite;
 }
 .smoke-cloud-5 {
-  animation: drift5 32s ease-in-out infinite;
+  animation: drift5 36s ease-in-out infinite;
 }
 
 @keyframes drift1 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.8;
-  }
-  25% {
-    transform: translate(40px, 20px) scale(1.05);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(20px, 40px) scale(0.95);
-    opacity: 0.7;
-  }
-  75% {
-    transform: translate(-20px, 15px) scale(1.02);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(35px, 15px, 0); }
+  50% { transform: translate3d(15px, 30px, 0); }
+  75% { transform: translate3d(-15px, 10px, 0); }
 }
 
 @keyframes drift2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.7;
-  }
-  33% {
-    transform: translate(-50px, 30px) scale(1.08);
-    opacity: 1;
-  }
-  66% {
-    transform: translate(-20px, -25px) scale(0.92);
-    opacity: 0.6;
-  }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(-40px, 25px, 0); }
+  66% { transform: translate3d(-15px, -20px, 0); }
 }
 
 @keyframes drift3 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.6;
-  }
-  30% {
-    transform: translate(30px, -20px) scale(1.1);
-    opacity: 0.9;
-  }
-  60% {
-    transform: translate(-40px, 15px) scale(0.95);
-    opacity: 0.7;
-  }
-  80% {
-    transform: translate(10px, 30px) scale(1.03);
-    opacity: 0.8;
-  }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  30% { transform: translate3d(25px, -15px, 0); }
+  60% { transform: translate3d(-30px, 12px, 0); }
+  80% { transform: translate3d(10px, 25px, 0); }
 }
 
 @keyframes drift4 {
-  0%, 100% {
-    transform: translateX(-50%) translate(0, 0) scale(1);
-    opacity: 0.7;
-  }
-  40% {
-    transform: translateX(-50%) translate(60px, -20px) scale(1.06);
-    opacity: 1;
-  }
-  70% {
-    transform: translateX(-50%) translate(-30px, 15px) scale(0.94);
-    opacity: 0.6;
-  }
+  0%, 100% { transform: translate3d(-50%, 0, 0); }
+  40% { transform: translate3d(calc(-50% + 45px), -15px, 0); }
+  70% { transform: translate3d(calc(-50% - 25px), 10px, 0); }
 }
 
 @keyframes drift5 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translate(45px, -30px) scale(1.12);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(35px, -25px, 0); }
 }
 
-/* Mobile: simpler drift — translate only, no scale (scale on blurred elements is very expensive) */
-@media (max-width: 767px) {
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
   .smoke-cloud-1,
   .smoke-cloud-2,
   .smoke-cloud-3,
   .smoke-cloud-4,
   .smoke-cloud-5 {
-    will-change: auto;
+    animation: none !important;
   }
-  .smoke-cloud-1 { animation: drift-m1 30s ease-in-out infinite; }
-  .smoke-cloud-2 { animation: drift-m2 35s ease-in-out infinite; }
-  .smoke-cloud-3 { animation: drift-m3 32s ease-in-out infinite; }
+}
+
+/* Mobile: lighter drift */
+@media (max-width: 767px) {
+  .smoke-cloud-1 { animation: drift-m1 32s ease-in-out infinite; }
+  .smoke-cloud-2 { animation: drift-m2 38s ease-in-out infinite; }
+  .smoke-cloud-3 { animation: drift-m3 34s ease-in-out infinite; }
 
   @keyframes drift-m1 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(20px, 15px); }
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(15px, 10px, 0); }
   }
   @keyframes drift-m2 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-25px, 15px); }
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(-18px, 10px, 0); }
   }
   @keyframes drift-m3 {
-    0%, 100% { transform: translateX(-50%) translate(0, 0); }
-    50% { transform: translateX(-50%) translate(20px, -10px); }
+    0%, 100% { transform: translate3d(-50%, 0, 0); }
+    50% { transform: translate3d(calc(-50% + 15px), -8px, 0); }
   }
 }

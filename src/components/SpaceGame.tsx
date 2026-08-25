@@ -491,57 +491,6 @@ export default function SpaceGame({
 
   return (
     <>
-      {/* Trigger button — bottom-left */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setGameOpen(true)}
-        className="fixed z-[90]"
-        style={{
-          bottom: "24px",
-          left: "24px",
-          width: "48px",
-          height: "48px",
-          borderRadius: "14px",
-          background: "rgba(17, 17, 24, 0.8)",
-          border: "1px solid rgba(26, 26, 37, 0.8)",
-          backdropFilter: "blur(20px)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-        }}
-        title="Play a game!"
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="rgba(129, 140, 248, 0.8)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="2" y="6" width="20" height="12" rx="3" />
-          <line x1="6" y1="10" x2="6" y2="14" />
-          <line x1="4" y1="12" x2="8" y2="12" />
-          <circle
-            cx="16"
-            cy="10"
-            r="1"
-            fill="rgba(129, 140, 248, 0.8)"
-          />
-          <circle
-            cx="19"
-            cy="12"
-            r="1"
-            fill="rgba(129, 140, 248, 0.8)"
-          />
-        </svg>
-      </motion.button>
-
       {/* Game overlay — full screen, responsive */}
       <AnimatePresence>
         {gameOpen && (

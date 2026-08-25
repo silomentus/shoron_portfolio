@@ -26,13 +26,22 @@ function CountUp({ target }: { target: number }) {
 }
 
 const stats = [
-  { label: "Projects Built", value: 7, suffix: "+" },
+  { label: "Projects Built", value: 10, suffix: "+" },
   { label: "Technologies", value: 15, suffix: "+" },
   { label: "Years Learning", value: 4, suffix: "+" },
   { label: "Year Experience", value: 1, suffix: "+" },
 ];
 
 export default function About() {
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const handleCopyEmail = () => {
+    const email = atob("c2lsb21lbnR1c0BnbWFpbC5jb20=");
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2500);
+  };
+
   return (
     <section id="about" style={{ padding: "140px 24px" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
@@ -66,10 +75,22 @@ export default function About() {
                 href="https://www.northsouth.edu/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-accent hover:text-accent-light transition-colors duration-300"
-                style={{ textDecoration: "none", borderBottom: "1px solid var(--color-accent-dark)" }}
+                className="inline text-accent hover:text-accent-light underline underline-offset-4 decoration-accent/40 hover:decoration-accent transition-colors duration-300 font-medium group/nsu"
               >
                 North South University
+                <svg
+                  className="inline-block w-3.5 h-3.5 ml-1 align-baseline opacity-75 group-hover/nsu:opacity-100 group-hover/nsu:translate-x-0.5 group-hover/nsu:-translate-y-0.5 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.2}
+                    d="M7 17L17 7M17 7H7M17 7V17"
+                  />
+                </svg>
               </a>
               {personalInfo.summary.split("North South University")[1]}
             </p>
@@ -252,13 +273,18 @@ export default function About() {
                   >
                     {edu.institution}
                   </p>
-                  <a
-                    href="#contact"
-                    className="text-accent/60 hover:text-accent font-mono transition-colors duration-300"
-                    style={{ fontSize: "13px", textDecoration: "none" }}
+                  <span
+                    className="inline-block font-mono text-accent/80"
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      background: "rgba(129, 140, 248, 0.08)",
+                      border: "1px solid rgba(129, 140, 248, 0.15)",
+                    }}
                   >
                     {edu.result}
-                  </a>
+                  </span>
                 </motion.div>
               ))}
             </div>
@@ -300,23 +326,33 @@ export default function About() {
                     {personalInfo.location}
                   </p>
                 </div>
-                <div>
+                <div
+                  onClick={handleCopyEmail}
+                  className="cursor-pointer group/email"
+                  title="Click to copy email address"
+                >
                   <span
-                    className="text-text-muted/80 font-mono uppercase"
+                    className="text-text-muted/80 font-mono uppercase flex items-center justify-between"
                     style={{
-                      display: "block",
                       marginBottom: "6px",
                       fontSize: "11px",
                       letterSpacing: "0.05em",
                     }}
                   >
-                    Email
+                    <span>Email</span>
+                    <span className="text-[10px] text-accent/70 lowercase font-normal">
+                      {copiedEmail ? "✓ copied" : "click to copy"}
+                    </span>
                   </span>
                   <p
-                    className="text-accent font-medium"
+                    className={`font-mono transition-colors duration-300 ${
+                      copiedEmail
+                        ? "text-emerald-400 font-medium"
+                        : "text-accent group-hover/email:text-accent-light"
+                    }`}
                     style={{ wordBreak: "break-all", fontSize: "13px" }}
                   >
-                    {personalInfo.email}
+                    {copiedEmail ? "Copied to clipboard! ✓" : "silomentus [at] gmail"}
                   </p>
                 </div>
               </div>

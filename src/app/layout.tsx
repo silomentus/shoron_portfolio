@@ -25,19 +25,40 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shoron | Software Engineer",
+  title: "Md. Harun Or Rashid (Shoron) | Backend Software Engineer",
   description:
-    "Portfolio of Shoron — Software Engineer specializing in backend development, AI/ML, and full-stack solutions.",
+    "Portfolio of Md. Harun Or Rashid (Shoron) — Backend Software Engineer at Appinion BD specializing in scalable architectures, Laravel, PHP, MySQL, REST APIs, and applied AI/ML systems.",
   keywords: [
-    "software engineer",
-    "portfolio",
-    "web developer",
-    "backend developer",
-    "Laravel",
-    "Python",
+    "Shoron",
+    "Md. Harun Or Rashid",
+    "Software Engineer",
+    "Backend Developer",
+    "Appinion BD",
+    "Laravel Developer",
+    "PHP",
+    "MySQL",
+    "REST API",
+    "Fintech",
+    "North South University",
     "AI",
-    "machine learning",
+    "Machine Learning",
   ],
+  authors: [{ name: "Md. Harun Or Rashid (Shoron)" }],
+  creator: "Md. Harun Or Rashid (Shoron)",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Md. Harun Or Rashid (Shoron) | Backend Software Engineer",
+    description:
+      "Backend Software Engineer at Appinion BD building scalable enterprise architectures, fintech platforms, and intelligent software systems.",
+    siteName: "Shoron Portfolio",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Md. Harun Or Rashid (Shoron) | Backend Software Engineer",
+    description:
+      "Backend Software Engineer at Appinion BD building scalable enterprise architectures, fintech platforms, and intelligent software systems.",
+  },
 };
 
 export default function RootLayout({
