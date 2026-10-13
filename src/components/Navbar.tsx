@@ -128,12 +128,12 @@ export default function Navbar({
             {/* Actions */}
             <div className="flex items-center gap-2">
               {onRequestCV && (
-                <Magnetic strength={0.2} className="hidden sm:inline-flex">
+                <Magnetic strength={0.2} className="hidden md:inline-flex">
                   <button
                     onClick={onRequestCV}
-                    className="label-mono group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/[0.08] bg-surface-low/80 px-3.5 py-2 text-on-surface transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-[0_0_24px_rgba(129,140,248,0.18)]"
+                    className="label-mono group inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/[0.08] bg-surface-low/80 px-3 py-1.5 text-[11px] text-on-surface transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-[0_0_24px_rgba(129,140,248,0.18)]"
                   >
-                    <LuFileText className="h-4 w-4 text-primary transition-transform duration-300 group-hover:-rotate-6" />
+                    <LuFileText className="h-3.5 w-3.5 text-primary transition-transform duration-300 group-hover:-rotate-6" />
                     Request CV
                   </button>
                 </Magnetic>
@@ -144,9 +144,9 @@ export default function Navbar({
                     onClick={onPlayGame}
                     aria-label="Play space game"
                     title="Play a mini game"
-                    className="grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-primary text-on-primary shadow-[0_0_20px_rgba(189,194,255,0.25)] transition-transform duration-300 hover:scale-110 active:scale-95"
+                    className="grid h-7 w-7 cursor-pointer place-items-center rounded-full bg-primary text-on-primary shadow-[0_0_14px_rgba(189,194,255,0.22)] transition-transform duration-300 hover:scale-110 active:scale-95"
                   >
-                    <LuGamepad2 className="h-[18px] w-[18px]" />
+                    <LuGamepad2 className="h-3.5 w-3.5" />
                   </button>
                 </Magnetic>
               )}
@@ -221,18 +221,19 @@ export default function Navbar({
               </ul>
 
               {onRequestCV && (
-                <div className="mt-6 border-t border-white/[0.06] pt-4">
+                <div className="mt-3 border-t border-white/[0.05] pt-2.5">
                   <motion.button
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45, duration: 0.4, ease: EASE }}
+                    transition={{ delay: 0.45, duration: 0.35, ease: EASE }}
                     onClick={() => {
                       setOpen(false);
                       onRequestCV();
                     }}
-                    className="label-mono flex w-auto max-w-[200px] cursor-pointer items-center justify-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3.5 py-2 text-[12px] text-primary transition-all duration-300 hover:bg-primary hover:text-on-primary"
+                    style={{ fontSize: "9px", padding: "3px 8px", lineHeight: "12px" }}
+                    className="inline-flex w-fit cursor-pointer items-center justify-center gap-1 rounded border border-primary/25 bg-primary/10 font-mono font-semibold tracking-wider uppercase text-primary transition-all duration-300 hover:bg-primary hover:text-on-primary active:scale-95"
                   >
-                    <LuFileText className="h-3.5 w-3.5" /> Request CV
+                    <LuFileText style={{ width: "9px", height: "9px" }} /> Request CV
                   </motion.button>
                 </div>
               )}

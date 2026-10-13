@@ -77,41 +77,110 @@ export default function About() {
               <CopyEmail />
             </Reveal>
 
-            {/* Sparkline */}
-            <Reveal delay={0.2} className="mt-6">
-              <SpotlightCard accent="tertiary" className="glass rounded-xl p-5">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="label-mono text-on-surface-variant">SYSTEM AVAILABILITY TARGET</span>
+            {/* Infographics: SLA & Latency */}
+            <Reveal delay={0.2} className="mt-6 space-y-3">
+              <SpotlightCard accent="tertiary" className="glass relative overflow-hidden rounded-xl p-5">
+                {/* Continuous ambient scanline */}
+                <motion.div
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  className="pointer-events-none absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-tertiary/10 to-transparent"
+                />
+
+                <div className="mb-2 flex items-center justify-between relative z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-tertiary opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-tertiary" />
+                    </span>
+                    <span className="label-mono text-on-surface-variant">SYSTEM AVAILABILITY TARGET</span>
+                  </div>
                   <span className="badge-tag text-tertiary">99.98% SLA</span>
                 </div>
-                <svg className="h-14 w-full text-tertiary" fill="none" viewBox="0 0 300 40" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="currentColor" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <motion.path
-                    d={`${SPARK} L300 40 L0 40 Z`}
-                    fill="url(#spark-fill)"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.2, delay: 0.8 }}
+                <div className="relative">
+                  <svg className="h-12 w-full text-tertiary" fill="none" viewBox="0 0 300 40" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor="currentColor" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <motion.path
+                      d={`${SPARK} L300 40 L0 40 Z`}
+                      fill="url(#spark-fill)"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, delay: 0.8 }}
+                    />
+                    <motion.path
+                      d={SPARK}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                      initial={{ pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.8, ease: EASE, delay: 0.2 }}
+                    />
+                  </svg>
+                  {/* Continuous live heartbeat point on sparkline endpoint */}
+                  <motion.div
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-tertiary shadow-[0_0_10px_#e5a93c]"
                   />
-                  <motion.path
-                    d={SPARK}
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    vectorEffect="non-scaling-stroke"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.8, ease: EASE, delay: 0.2 }}
-                  />
-                </svg>
+                </div>
+              </SpotlightCard>
+
+              {/* P99 Response Latency Distribution */}
+              <SpotlightCard accent="primary" className="glass relative overflow-hidden rounded-xl p-5">
+                <div className="mb-2.5 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="label-mono text-on-surface-variant">P99 REST API LATENCY</span>
+                    </div>
+                    <p className="text-[11px] text-on-surface-variant/70">Production endpoint response distribution</p>
+                  </div>
+                  <span className="badge-tag text-primary">&lt; 120ms P99</span>
+                </div>
+                <div className="flex h-10 items-end gap-1.5 pt-1">
+                  {[28, 42, 65, 88, 100, 75, 45, 30, 18, 12, 8, 4].map((h, idx) => (
+                    <div key={idx} className="group/bar relative flex-1 h-full flex items-end">
+                      <motion.div
+                        initial={{ height: 0 }}
+                        whileInView={{ height: `${h}%` }}
+                        viewport={{ once: true }}
+                        animate={{
+                          height: [`${h}%`, `${Math.max(10, Math.min(100, h + (idx % 2 === 0 ? 8 : -8)))}%`, `${h}%`],
+                        }}
+                        transition={{
+                          height: {
+                            duration: 2.4 + (idx % 3) * 0.4,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: idx * 0.15,
+                          },
+                        }}
+                        className={`w-full rounded-t-sm transition-colors ${
+                          idx === 4
+                            ? "bg-primary shadow-[0_0_12px_rgba(186,155,255,0.6)]"
+                            : idx > 4
+                            ? "bg-primary/30 group-hover/bar:bg-primary/60"
+                            : "bg-primary/50 group-hover/bar:bg-primary/80"
+                        }`}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-on-surface-variant/60">
+                  <span>20ms</span>
+                  <span className="text-primary font-semibold">Median ~48ms</span>
+                  <span>140ms</span>
+                </div>
               </SpotlightCard>
             </Reveal>
           </div>

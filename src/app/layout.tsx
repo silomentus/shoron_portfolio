@@ -7,14 +7,12 @@ const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
 });
 
 const sora = Sora({
   subsets: ["latin"],
   variable: "--font-sora",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const jetbrainsMono = JetBrains_Mono({

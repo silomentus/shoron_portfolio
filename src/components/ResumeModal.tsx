@@ -86,33 +86,29 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-          style={{
-            backdropFilter: "blur(16px)",
-            backgroundColor: "rgba(0, 0, 0, 0.75)",
-          }}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
         >
           {/* Backdrop click to close */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
-            className="absolute inset-0"
+            className="absolute inset-0 cursor-pointer"
           />
 
           {/* Modal Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 15 }}
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 15 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.1, 0, 1] }}
-            className="relative w-full max-w-lg overflow-hidden border border-white/[0.1]"
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.18, ease: [0.25, 0.1, 0, 1] }}
+            className="relative w-full max-w-lg overflow-hidden border border-white/[0.1] bg-[#0d0d13]"
             style={{
               borderRadius: "20px",
               boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8)",
-              backgroundColor: "#0d0d13",
             }}
           >
             {/* Top Accent Gradient Line */}
@@ -258,15 +254,14 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                     </div>
 
                     <h3
-                      className="font-display font-bold text-text mb-1"
-                      style={{ fontSize: "22px", letterSpacing: "-0.02em" }}
+                      className="font-display font-bold text-text mb-1 text-[18px] sm:text-[22px] tracking-tight"
                     >
                       Request Resume Access
                     </h3>
 
                     <p
-                      className="text-text-muted text-xs leading-relaxed"
-                      style={{ lineHeight: 1.6 }}
+                      className="text-text-muted text-[11px] sm:text-xs leading-relaxed"
+                      style={{ lineHeight: 1.5 }}
                     >
                       Direct CV access is gated for hiring teams, recruiters, and engineering leaders. Provide your organization details below to receive access.
                     </p>
@@ -441,7 +436,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               )}
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
