@@ -1,102 +1,130 @@
 <div align="center">
 
-# Shoron — Portfolio
+# Shoron — Personal Portfolio & Engineering Architecture
 
-A high-performance, visually immersive developer portfolio built with Next.js 16, featuring real-time 3D particle effects, smooth animations, and a fully responsive design optimized for every device.
+A high-performance, dark-space synthetic portfolio engineered with **Next.js 16 (Turbopack)**, **React 19**, and **Tailwind CSS v4**. Featuring live hardware-accelerated infographics, desktop momentum physics via **Lenis**, and a 120Hz native touch pipeline across all mobile devices.
 
-**[Live Site](https://shoron.vercel.app)**
+[![Live Site](https://img.shields.io/badge/Live_Site-shoron.vercel.app-58a6ff?style=for-the-badge&logo=vercel&logoColor=white)](https://shoron.vercel.app)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/md-harun-or-rashid-shoron)
+[![GitHub](https://img.shields.io/badge/GitHub-silomentus-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/silomentus)
 
----
+<br/>
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16.1.6-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.2-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Three.js](https://img.shields.io/badge/Three.js-r183-black?style=for-the-badge&logo=three.js)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-FF0055?style=for-the-badge&logo=framer&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?style=for-the-badge&logo=vercel)
+![Lenis](https://img.shields.io/badge/Lenis-Smooth_Scroll-black?style=for-the-badge)
 
 </div>
 
 ---
 
-## Overview
+## 🌌 Overview
 
-This portfolio is designed to deliver a premium, memorable experience — not just a list of projects. It combines a space-themed aesthetic with subtle interactivity to keep visitors engaged while maintaining blazing-fast performance across all devices.
+Designed around an obsidian dark canvas void (`#030305`) with subtle violet and cyan ambient glows, this site showcases enterprise backend architecture, distributed transactions, and applied machine learning research.
 
-### Key Highlights
-
-- **3D Space Background** — Real-time particle rain, twinkling stars, nebula shader fog, and shooting stars powered by Three.js and custom GLSL shaders
-- **Adaptive Performance** — Automatically detects device capabilities and adjusts rendering complexity — disabling WebGL, reducing effects, and simplifying animations on mobile for a smooth experience on any hardware
-- **Custom Cursor** — Canvas-based cursor with trail effects, radial glow, and hover-aware ring expansion (desktop only)
-- **Interactive Mini-Game** — A built-in "Star Collector" space game accessible from the navbar — pilot a ship, collect stars, dodge asteroids
-- **Emoji Reaction Bar** — Floating reaction picker that spawns animated emoji particles
-- **Smooth Scroll Animations** — Every section animates into view with staggered reveals, count-up stats, and intersection-observer-driven effects
-- **Contact Form** — Functional contact form with real-time validation and submission feedback
+Rather than static lists, it presents **live-animated engineering telemetry**, interactive spotlight modules, and verified production benchmarks.
 
 ---
 
-## Sections
+## ✨ Key Highlights
 
-| Section | Description |
-|---------|-------------|
-| **Hero** | Animated typewriter cycling through roles, rotating taglines, and a pulsing "open to opportunities" badge |
-| **About** | Animated count-up stats (Projects, Technologies, Years Learning, Experience), education timeline with hover effects, and quick info card |
-| **Experience** | Vertical timeline with glass-morphism cards, live status indicator, role details, responsibilities, and interactive tech tags |
-| **Projects** | Filterable project grid with animated category tabs, project cards with tech stacks, and hover-lift effects |
-| **Skills** | Icon grid for programming languages with hover scale, plus categorized pill chips for Backend, AI/ML, and Tools with border glow |
-| **Contact** | Split layout — contact info cards and social links on the left, validated contact form on the right |
-
----
-
-## Tech Stack
-
-### Core
-
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| [Next.js](https://nextjs.org) | 16.1 | React framework with App Router |
-| [React](https://react.dev) | 19.2 | UI library |
-| [TypeScript](https://typescriptlang.org) | 5.9 | Type safety |
-| [Tailwind CSS](https://tailwindcss.com) | 4.2 | Utility-first styling |
-
-### Animation & Graphics
-
-| Technology | Purpose |
-|-----------|---------|
-| [Three.js](https://threejs.org) + React Three Fiber | 3D particle systems, nebula shader, shooting stars |
-| [Framer Motion](https://motion.dev) | Page transitions, layout animations, stagger effects, spring physics |
-| Custom Canvas 2D | Cursor trail rendering, space game engine |
-| GLSL Shaders | Nebula fog with Simplex noise FBM, additive blending |
+- **Live Animated Infographics**:
+  - **SLA & Uptime Sparkline**: Self-drawing 99.98% SLA graph with ambient radar sweeps and live heartbeat beacon.
+  - **P99 API Latency Histogram**: Breathing 12-bar response distribution visualizer simulating live production traffic.
+  - **Production Query Profiling**: Visual before/after latency comparison showcasing the **-18.4% query optimization** (182ms → 148ms) and peak **7,000+ field officer** concurrency.
+  - **Architecture Domain Allocator**: Continuous shimmering progress breakdown (Backend 45%, MySQL 25%, AI/ML 20%, DevOps 10%).
+- **Interactive Space Mini-Game**:
+  - Built-in canvas arcade game accessible from the navigation bar. Dodge asteroids, collect stars, and test agility directly inside the browser.
+- **Enterprise System Portfolio**:
+  - Detailed architectural cards for 6 industry systems (FFA, Cooperative ERP, Microfinance Engine, Banking Operations, Hospital & Clinic Management, and E-Commerce).
+  - Academic research catalog linked with North South University course codes (CSE499A/B, CSE498R, CSE465, CSE445, CSE327, CSE311, CSE299).
+- **Gated Resume Access Flow**:
+  - Purpose-built dispatch modal with organization inquiry routing and Web3Forms backend integration.
+- **Device-Optimized Scrolling & Transitions**:
+  - Desktop: Inertia-driven smooth scrolling powered by **Lenis**.
+  - Mobile: Lenis automatically decouples on touch viewports, preserving **native 120Hz momentum scrolling** with zero gesture locking or modal exit lag.
 
 ---
 
-## Performance
+## 🏛️ Architecture & Sections
 
-This site is heavily optimized to eliminate load stutter across all devices:
-
-### Mobile
-- Three.js completely disabled — CSS-only background with lightweight drift animations
-- Reduced blur radii, fewer smoke clouds, no SVG noise overlay
-- Simplified keyframe animations — translate-only, no `scale()` on blurred elements
-- Custom cursor and GPU-heavy overlays skipped entirely
-
-### Desktop
-- Deferred Three.js initialization — content paints before WebGL starts
-- Non-critical components lazy loaded after initial paint
-- Self-hosted fonts via `next/font` with `display: swap`
-- GPU compositing hints on animated elements
+| Section | Focus & Interactive Features |
+|---------|------------------------------|
+| **Navigation** | Auto-hiding glass header with layout spring pill, compact mini-game trigger, and accessible drawer. |
+| **Hero** | Display typography, rotating software engineering specialties, quick-link CTAs, and 3 high-impact focus cards. |
+| **About** | Engineering biography, one-click copy email pill, live SLA sparkline, and P99 latency histogram. |
+| **Experience** | Appinion BD Limited production timeline, live ACID compliance beacon, and query optimization telemetry. |
+| **Projects** | Multi-system enterprise grid alongside filterable academic machine learning & computer vision projects. |
+| **Technical Matrix**| 4-quadrant skill grid (Languages, Backend Architecture, AI & ML, DevOps) + system domain allocation bar. |
+| **Writing** | Engineering reflections and research articles with custom reading tags. |
+| **Contact** | Connectivity matrix (LinkedIn, Dhaka HQ, direct email) + glass Web3Forms dispatch form. |
 
 ---
 
-## License
+## 🛠️ Tech Stack
 
-This project is the personal portfolio of **Shoron**. You're welcome to take inspiration from the design and ideas, but please don't copy the code or content wholesale. If something here helps you build your own portfolio, a credit or mention would be appreciated.
+### Core Framework & State
+- **Framework**: [Next.js 16.1.6](https://nextjs.org) (Turbopack, App Router)
+- **Library**: [React 19.2.4](https://react.dev)
+- **Language**: [TypeScript 5.9](https://www.typescriptlang.org)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com) + PostCSS
+
+### Motion & Visualization
+- **Motion Engine**: [Framer Motion 12.36](https://motion.dev) (Hardware-accelerated transforms, layout springs)
+- **Smooth Scrolling**: [Lenis 1.3](https://github.com/darkroomengineering/lenis) (Desktop wheel inertia)
+- **Iconography**: [React Icons](https://react-icons.github.io/react-icons/) (Lu Icons, FontAwesome 6)
+- **Form Dispatch**: [Web3Forms API](https://web3forms.com)
+
+---
+
+## ⚡ Performance Engineering
+
+- **Native Touch Isolation**: Touch devices bypass synthetic scroll loops to prevent main-thread latency and modal unmount delays.
+- **Sub-150ms Modal Dismiss**: Modal backdrops leverage lightweight GPU-composited CSS filters (`backdrop-blur-md`) rather than heavy multi-pass blur textures.
+- **Variable Font Delivery**: Optimized self-hosted Google Fonts (`DM Sans`, `Sora`, `JetBrains Mono`) with `display: swap` to prevent layout shifts.
+- **Zero-Deadlock Layout Springs**: Staggered component reveals use non-blocking triggers for instant initial paint.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18.18+ or 20+
+- npm, pnpm, or yarn
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/silomentus/Portfolio.git
+
+# Navigate into directory
+cd Portfolio
+
+# Install dependencies
+npm install
+
+# Start local development server with Turbopack
+npm run dev
+```
+
+Visit `http://localhost:3000` in your browser.
+
+### Production Build
+```bash
+# Compile optimized static pages
+npm run build
+
+# Start production server
+npm start
+```
 
 ---
 
 <div align="center">
 
-**Built with care by [Shoron](https://www.linkedin.com/in/md-harun-or-rashid-309377225/)**
+Crafted with care by **[Md. Harun Or Rashid (Shoron)](https://linkedin.com/in/md-harun-or-rashid-shoron)** · **[silomentus](https://github.com/silomentus)**
 
 </div>
