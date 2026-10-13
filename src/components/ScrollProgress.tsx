@@ -5,20 +5,16 @@ import { motion, useScroll, useSpring } from "framer-motion";
 export default function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 120,
+    damping: 28,
     restDelta: 0.001,
   });
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 z-[100] origin-left"
-      style={{
-        scaleX,
-        height: "2px",
-        background:
-          "linear-gradient(90deg, var(--color-accent-dark), var(--color-accent), var(--color-accent-light))",
-      }}
+      aria-hidden
+      className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-gradient-to-r from-primary-container via-violet to-tertiary"
+      style={{ scaleX }}
     />
   );
 }

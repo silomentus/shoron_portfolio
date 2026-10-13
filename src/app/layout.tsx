@@ -21,7 +21,6 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jb-mono",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -59,6 +58,15 @@ export const metadata: Metadata = {
     description:
       "Backend Software Engineer at Appinion BD building scalable enterprise architectures, fintech platforms, and intelligent software systems.",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -68,7 +76,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${dmSans.variable} ${sora.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="antialiased noise ambient-bg">
+      <body className="antialiased grain bg-canvas text-on-surface">
         {children}
         <Analytics />
       </body>

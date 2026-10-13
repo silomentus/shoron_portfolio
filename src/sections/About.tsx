@@ -1,373 +1,173 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
-import SectionHeading from "@/components/SectionHeading";
-import { personalInfo, education } from "@/lib/data";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { LuCheck, LuCopy, LuGraduationCap, LuMail, LuMapPin } from "react-icons/lu";
+import { education, personalInfo } from "@/lib/data";
+import { EASE, Reveal, SectionHeader, SpotlightCard, Stagger, StaggerItem } from "@/components/ui";
 
-function CountUp({ target }: { target: number }) {
-  const [count, setCount] = useState(0);
-  const { ref, inView } = useInView({ triggerOnce: true });
+const SPARK = "M0 32 L40 28 L80 30 L120 18 L160 22 L200 12 L240 15 L280 8 L300 10";
 
-  useEffect(() => {
-    if (!inView) return;
-    let start = 0;
-    const stepTime = 2000 / target;
-    const timer = setInterval(() => {
-      start += 1;
-      setCount(start);
-      if (start >= target) clearInterval(timer);
-    }, stepTime);
-    return () => clearInterval(timer);
-  }, [target, inView]);
-
-  return <span ref={ref}>{count}</span>;
+function CopyEmail() {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(personalInfo.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2200);
+  };
+  return (
+    <button
+      onClick={copy}
+      className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/[0.06] bg-surface-high/50 px-3 py-2 text-[13px] text-on-surface transition-colors duration-300 hover:border-tertiary/30 hover:bg-surface-high"
+    >
+      <LuMail className="h-[18px] w-[18px] text-tertiary" />
+      <span>silomentus [at] gmail.com</span>
+      <span className="relative grid h-4 w-4 place-items-center">
+        <AnimatePresence mode="wait" initial={false}>
+          {copied ? (
+            <motion.span key="ok" initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}>
+              <LuCheck className="h-3.5 w-3.5 text-emerald" />
+            </motion.span>
+          ) : (
+            <motion.span key="cp" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+              <LuCopy className="h-3.5 w-3.5 text-on-surface-variant transition-colors group-hover:text-primary" />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
+    </button>
+  );
 }
 
-const stats = [
-  { label: "Projects Built", value: 10, suffix: "+" },
-  { label: "Technologies", value: 15, suffix: "+" },
-  { label: "Years Learning", value: 4, suffix: "+" },
-  { label: "Year Experience", value: 1, suffix: "+" },
-];
-
 export default function About() {
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const handleCopyEmail = () => {
-    const email = atob("c2lsb21lbnR1c0BnbWFpbC5jb20=");
-    navigator.clipboard.writeText(email);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2500);
-  };
+  const [nsu, ...school] = education;
 
   return (
-    <section id="about" style={{ padding: "140px 24px" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <SectionHeading title="About Me" subtitle="Who I Am" />
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "72px",
-          }}
-          className="md:!grid-cols-2"
-        >
-          {/* Left - Text */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0, 1] }}
-          >
-            <p
-              className="text-text-muted leading-relaxed"
-              style={{
-                fontSize: "16px",
-                lineHeight: 1.9,
-                marginBottom: "24px",
-              }}
-            >
-              {personalInfo.summary.split("North South University")[0]}
-              <a
-                href="https://www.northsouth.edu/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline text-accent hover:text-accent-light underline underline-offset-4 decoration-accent/40 hover:decoration-accent transition-colors duration-300 font-medium group/nsu"
-              >
-                North South University
-                <svg
-                  className="inline-block w-3.5 h-3.5 ml-1 align-baseline opacity-75 group-hover/nsu:opacity-100 group-hover/nsu:translate-x-0.5 group-hover/nsu:-translate-y-0.5 transition-transform duration-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.2}
-                    d="M7 17L17 7M17 7H7M17 7V17"
-                  />
-                </svg>
-              </a>
-              {personalInfo.summary.split("North South University")[1]}
-            </p>
-            <p
-              className="text-text-muted leading-relaxed"
-              style={{
-                fontSize: "16px",
-                lineHeight: 1.9,
-                marginBottom: "48px",
-              }}
-            >
-              My academic experience built a strong foundation in artificial
-              intelligence, machine learning, and software engineering. I enjoy
-              solving complex problems and turning ideas into efficient,
-              well-structured systems.
-            </p>
-
-            {/* Stats grid */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-              }}
-            >
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    delay: i * 0.1,
-                    duration: 0.6,
-                    ease: [0.25, 0.1, 0, 1],
-                  }}
-                  className="glass-card-hover group"
-                  style={{ padding: "28px 24px", borderRadius: "16px" }}
-                >
-                  <div
-                    className="font-display font-bold text-accent"
-                    style={{
-                      fontSize: "36px",
-                      marginBottom: "4px",
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
-                    <CountUp target={stat.value} />
-                    <span className="text-accent-light">{stat.suffix}</span>
-                  </div>
-                  <div
-                    className="text-text-muted"
-                    style={{ fontSize: "13px", letterSpacing: "0.02em" }}
-                  >
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
+    <section id="about" className="relative py-20 md:py-28">
+      <div className="container-x">
+        <div className="flex flex-col items-start gap-10 lg:flex-row lg:gap-14">
+          {/* Bio */}
+          <div className="w-full lg:w-5/12">
+            <SectionHeader index="01" label="Who I Am" title="About Me & Foundations" />
+            <div className="-mt-4 space-y-4 text-[15px] leading-relaxed text-on-surface-variant">
+              <Reveal>
+                <p>
+                  I am a Computer Science graduate from{" "}
+                  <span className="font-medium text-on-surface">North South University (Dhaka)</span>,
+                  currently working as a{" "}
+                  <span className="font-medium text-on-surface">Software Engineer at Appinion BD</span>.
+                  My work focuses on backend development, API design, and building reliable, scalable
+                  software solutions.
+                </p>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <p>
+                  My academic experience built a strong foundation in artificial intelligence, machine
+                  learning, and scalable backend architecture. I enjoy solving complex problems and
+                  turning ideas into efficient, well-structured production systems.
+                </p>
+              </Reveal>
             </div>
-          </motion.div>
 
-          {/* Right - Education */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0, 1] }}
-          >
-            <h3
-              className="font-display font-semibold flex items-center"
-              style={{
-                fontSize: "20px",
-                marginBottom: "32px",
-                gap: "12px",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              <span
-                className="flex items-center justify-center"
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "10px",
-                  background:
-                    "linear-gradient(135deg, rgba(129, 140, 248, 0.15), rgba(167, 139, 250, 0.08))",
-                }}
-              >
-                <svg
-                  className="text-accent"
-                  style={{ width: "18px", height: "18px" }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 14l9-5-9-5-9 5 9 5z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                  />
-                </svg>
+            <Reveal delay={0.15} className="mt-6 flex flex-wrap gap-2.5">
+              <span className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-surface-high/50 px-3 py-2 text-[13px] text-on-surface">
+                <LuMapPin className="h-[18px] w-[18px] text-primary" />
+                {personalInfo.location}
               </span>
-              Education
-            </h3>
+              <CopyEmail />
+            </Reveal>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "28px",
-              }}
-            >
-              {education.map((edu, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    delay: i * 0.12,
-                    duration: 0.6,
-                    ease: [0.25, 0.1, 0, 1],
-                  }}
-                  className="group"
-                  style={{
-                    position: "relative",
-                    paddingLeft: "28px",
-                    borderLeft: "1px solid var(--color-border)",
-                    transition: "border-color 0.5s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.borderLeftColor =
-                      "rgba(129, 140, 248, 0.4)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.borderLeftColor =
-                      "var(--color-border)")
-                  }
-                >
-                  <div
-                    className="absolute rounded-full transition-all duration-500"
-                    style={{
-                      left: "-5px",
-                      top: "4px",
-                      width: "9px",
-                      height: "9px",
-                      backgroundColor: "var(--color-bg)",
-                      border: "2px solid var(--color-border)",
-                    }}
+            {/* Sparkline */}
+            <Reveal delay={0.2} className="mt-6">
+              <SpotlightCard accent="tertiary" className="glass rounded-xl p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="label-mono text-on-surface-variant">SYSTEM AVAILABILITY TARGET</span>
+                  <span className="badge-tag text-tertiary">99.98% SLA</span>
+                </div>
+                <svg className="h-14 w-full text-tertiary" fill="none" viewBox="0 0 300 40" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="spark-fill" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="currentColor" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <motion.path
+                    d={`${SPARK} L300 40 L0 40 Z`}
+                    fill="url(#spark-fill)"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, delay: 0.8 }}
                   />
-                  <div
-                    className="font-mono text-accent/70"
-                    style={{
-                      fontSize: "12px",
-                      marginBottom: "8px",
-                      letterSpacing: "0.02em",
-                    }}
-                  >
-                    {edu.duration}
-                  </div>
-                  <h4
-                    className="font-display font-semibold text-text"
-                    style={{
-                      fontSize: "16px",
-                      marginBottom: "4px",
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    {edu.degree}
-                  </h4>
-                  <p
-                    className="text-text-muted"
-                    style={{ fontSize: "14px", marginBottom: "6px" }}
-                  >
-                    {edu.institution}
-                  </p>
-                  <span
-                    className="inline-block font-mono text-accent/80"
-                    style={{
-                      fontSize: "12px",
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      background: "rgba(129, 140, 248, 0.08)",
-                      border: "1px solid rgba(129, 140, 248, 0.15)",
-                    }}
-                  >
-                    {edu.result}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+                  <motion.path
+                    d={SPARK}
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    vectorEffect="non-scaling-stroke"
+                    initial={{ pathLength: 0 }}
+                    whileInView={{ pathLength: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.8, ease: EASE, delay: 0.2 }}
+                  />
+                </svg>
+              </SpotlightCard>
+            </Reveal>
+          </div>
 
-            {/* Quick info card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.97 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="glass-card"
-              style={{
-                marginTop: "36px",
-                padding: "28px",
-                borderRadius: "16px",
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
-                  fontSize: "14px",
-                }}
-              >
-                <div>
-                  <span
-                    className="text-text-muted/80 font-mono uppercase"
-                    style={{
-                      display: "block",
-                      marginBottom: "6px",
-                      fontSize: "11px",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    Location
-                  </span>
-                  <p className="text-text font-medium">
-                    {personalInfo.location}
-                  </p>
-                </div>
-                <div
-                  onClick={handleCopyEmail}
-                  className="cursor-pointer group/email"
-                  title="Click to copy email address"
-                >
-                  <span
-                    className="text-text-muted/80 font-mono uppercase flex items-center justify-between"
-                    style={{
-                      marginBottom: "6px",
-                      fontSize: "11px",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    <span>Email</span>
-                    <span className="text-[10px] text-accent/70 lowercase font-normal">
-                      {copiedEmail ? "✓ copied" : "click to copy"}
+          {/* Education */}
+          <div className="w-full lg:w-7/12 lg:pt-[92px]">
+            <Reveal className="mb-5 flex items-center gap-2">
+              <LuGraduationCap className="h-5 w-5 text-primary" />
+              <h3 className="font-display text-[22px] font-semibold tracking-tight text-on-surface sm:text-[24px]">
+                Education & Background
+              </h3>
+            </Reveal>
+
+            <Stagger className="space-y-3" stagger={0.12}>
+              <StaggerItem>
+                <SpotlightCard className="glass relative overflow-hidden rounded-2xl p-6 transition-transform duration-500 hover:-translate-y-1">
+                  <div className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-primary/10 blur-2xl" />
+                  <div className="mb-2 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                    <span className="label-mono text-primary">{nsu.duration}</span>
+                    <span className="badge-tag self-start rounded-full bg-primary/10 px-2.5 py-1 text-primary sm:self-auto">
+                      Graduated
                     </span>
-                  </span>
-                  <p
-                    className={`font-mono transition-colors duration-300 ${
-                      copiedEmail
-                        ? "text-emerald-400 font-medium"
-                        : "text-accent group-hover/email:text-accent-light"
-                    }`}
-                    style={{ wordBreak: "break-all", fontSize: "13px" }}
-                  >
-                    {copiedEmail ? "Copied to clipboard! ✓" : "silomentus [at] gmail"}
+                  </div>
+                  <h4 className="font-display text-[18px] font-semibold tracking-tight text-on-surface sm:text-[20px]">
+                    BSc in Computer Science and Engineering
+                  </h4>
+                  <p className="font-medium text-on-surface-variant">{nsu.institution}</p>
+                  <p className="mt-2 text-[13px] leading-relaxed text-on-surface-variant/80">
+                    Rigorous curriculum emphasizing Data Structures, Algorithms, Software Engineering, Deep
+                    Learning, Distributed Systems, and Database Management.
                   </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+                </SpotlightCard>
+              </StaggerItem>
+
+              {school.map((e) => (
+                <StaggerItem key={e.degree}>
+                  <SpotlightCard className="glass flex flex-col justify-between gap-2 rounded-2xl p-5 transition-transform duration-500 hover:-translate-y-1 sm:flex-row sm:items-center">
+                    <div>
+                      <span className="label-mono text-on-surface-variant">{e.duration}</span>
+                      <h4 className="font-display text-[17px] font-semibold tracking-tight text-on-surface sm:text-[19px]">
+                        {e.degree}
+                      </h4>
+                      <p className="text-[13px] text-on-surface-variant">
+                        {e.institution} • {e.result}
+                      </p>
+                    </div>
+                    <span className="badge-tag self-start rounded-full bg-surface-highest px-2.5 py-1 text-on-surface-variant sm:self-auto">
+                      Science
+                    </span>
+                  </SpotlightCard>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (min-width: 768px) {
-          .md\\:!grid-cols-2 {
-            grid-template-columns: 1fr 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

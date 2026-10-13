@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { personalInfo } from "@/lib/data";
+import { setScrollLocked } from "@/components/SmoothScroll";
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -10,6 +11,11 @@ interface ResumeModalProps {
 }
 
 export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
+  useEffect(() => {
+    setScrollLocked(isOpen);
+    return () => setScrollLocked(false);
+  }, [isOpen]);
+
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -138,7 +144,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               </svg>
             </button>
 
-            <div style={{ padding: "32px 28px" }}>
+            <div className="p-4 sm:p-7">
               {status === "success" ? (
                 /* Success State */
                 <motion.div

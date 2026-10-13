@@ -1,348 +1,205 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { personalInfo } from "@/lib/data";
+import { useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import {
+  LuArrowUpRight,
+  LuBrain,
+  LuGraduationCap,
+  LuMail,
+  LuServer,
+  LuTerminal,
+} from "react-icons/lu";
+import { FaGithub } from "react-icons/fa6";
+import { heroFocus, heroRoles, personalInfo } from "@/lib/data";
+import { ACCENT, EASE, Magnetic, SplitText, SpotlightCard } from "@/components/ui";
 
-function TypeWriter({ words }: { words: string[] }) {
-  const [wordIndex, setWordIndex] = useState(0);
-  const [text, setText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+const focusIcons = { server: LuServer, brain: LuBrain, grad: LuGraduationCap };
 
-  useEffect(() => {
-    const currentWord = words[wordIndex];
-    const timeout = setTimeout(
-      () => {
-        if (!isDeleting) {
-          setText(currentWord.slice(0, text.length + 1));
-          if (text.length === currentWord.length) {
-            setTimeout(() => setIsDeleting(true), 2000);
-          }
-        } else {
-          setText(currentWord.slice(0, text.length - 1));
-          if (text.length === 0) {
-            setIsDeleting(false);
-            setWordIndex((prev) => (prev + 1) % words.length);
-          }
-        }
-      },
-      isDeleting ? 40 : 80
-    );
-    return () => clearTimeout(timeout);
-  }, [text, isDeleting, wordIndex, words]);
-
-  return (
-    <>
-      <span className="gradient-text">{text}</span>
-      <motion.span
-        animate={{ opacity: [1, 0] }}
-        transition={{
-          duration: 0.6,
-          repeat: Infinity,
-          repeatType: "reverse",
-        }}
-        className="text-accent inline-block ml-0.5"
-        style={{ fontWeight: 300 }}
-      >
-        |
-      </motion.span>
-    </>
-  );
-}
-
-const taglines = [
-  "Code it. Ship it. Learn from it.",
-  "Clean code over clever code.",
-  "Turning caffeine into backend systems.",
-  "If it works, make it better.",
-  "Building things that matter.",
-  "git commit -m 'life'",
-  "Ctrl + S your expectations",
+const marquee = [
+  "PHP", "Laravel", "MySQL", "REST APIs", "Python", "PyTorch", "TensorFlow",
+  "Redis", "RBAC", "Git", "OpenCV", "Scikit-Learn", "TypeScript", "Microservices",
 ];
 
-function RotatingTagline() {
-  const [index, setIndex] = useState(0);
-
+function RotatingRole() {
+  const [i, setI] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % taglines.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    const id = setInterval(() => setI((p) => (p + 1) % heroRoles.length), 3200);
+    return () => clearInterval(id);
   }, []);
-
   return (
-    <div
-      className="relative font-mono text-text-muted/70 italic"
-      style={{ fontSize: "14px", minHeight: "24px" }}
-    >
-      <AnimatePresence mode="wait">
+    <span className="relative inline-grid h-[1.4em] overflow-hidden align-bottom">
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
-          key={index}
-          initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0, 1] }}
+          key={i}
+          initial={{ y: "100%", opacity: 0, filter: "blur(6px)" }}
+          animate={{ y: "0%", opacity: 1, filter: "blur(0px)" }}
+          exit={{ y: "-100%", opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="col-start-1 row-start-1 whitespace-nowrap"
         >
-          &quot;{taglines[index]}&quot;
+          {heroRoles[i]}
         </motion.span>
       </AnimatePresence>
-    </div>
+    </span>
   );
 }
 
-export default function Hero() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.4 },
-    },
-  };
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 24, filter: "blur(8px)" },
+  animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+  transition: { duration: 1, ease: EASE, delay },
+});
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
-    visible: {
-      opacity: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: { duration: 1, ease: [0.25, 0.1, 0, 1] as const },
-    },
-  };
+export default function Hero() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const opacity = useTransform(scrollYProgress, [0, 0.95], [1, 0.2]);
 
   return (
     <section
       id="home"
-      className="relative min-h-[calc(100dvh-60px)] sm:min-h-screen flex flex-col items-center justify-center overflow-x-hidden pt-16 sm:pt-20 pb-12 sm:pb-20"
+      ref={ref}
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden pb-10 pt-24 sm:pt-28"
     >
+      {/* Hero glow */}
+      <div className="pointer-events-none absolute left-1/2 top-[8%] -z-10 h-[420px] w-[min(900px,90vw)] -translate-x-1/2 rounded-full bg-primary-container/5 blur-[120px]" />
+
       <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 text-center px-6 max-w-4xl mx-auto"
+        style={{ y, opacity }}
+        className="container-x relative will-change-transform max-sm:!opacity-100 max-sm:!transform-none"
       >
-        {/* Custom Status Chip */}
-        <motion.div
-          variants={itemVariants}
-          className="inline-flex items-center backdrop-blur-xl transition-all duration-300 hover:border-accent/40"
-          style={{
-            gap: "10px",
-            padding: "6px 16px",
-            marginBottom: "32px",
-            borderRadius: "999px",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            background: "rgba(17, 17, 24, 0.65)",
-            boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <span className="relative flex" style={{ width: "7px", height: "7px" }}>
-            <span
-              className="animate-ping absolute inline-flex rounded-full bg-emerald-400 opacity-75"
-              style={{ width: "100%", height: "100%" }}
-            />
-            <span
-              className="relative inline-flex rounded-full bg-emerald-400"
-              style={{ width: "7px", height: "7px", boxShadow: "0 0 8px rgba(52, 211, 153, 0.8)" }}
-            />
-          </span>
-          <span
-            className="font-mono text-emerald-400 font-medium tracking-wider uppercase"
-            style={{ fontSize: "11px" }}
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+          {/* Greeting */}
+          <motion.div
+            {...fadeUp(0.2)}
+            className="mb-4 flex items-center gap-2 font-mono text-[15px] font-semibold tracking-wide text-primary"
           >
-            Available
-          </span>
-          <span
-            style={{
-              width: "1px",
-              height: "12px",
-              background: "rgba(255, 255, 255, 0.12)",
-            }}
-          />
-          <span
-            className="text-text-muted font-mono"
-            style={{ fontSize: "12px", letterSpacing: "0.01em" }}
-          >
-            Backend Engineer @ Appinion BD
-          </span>
-        </motion.div>
+            <LuTerminal className="h-4 w-4 opacity-70" />
+            <span>Hello, I am {personalInfo.name}</span>
+            <span className="inline-block h-4 w-2 animate-blink bg-primary" />
+          </motion.div>
 
-        {/* Name */}
-        <motion.h1
-          variants={itemVariants}
-          className="font-display font-extrabold leading-none tracking-tighter"
-          style={{ marginBottom: "20px" }}
-        >
-          <span
-            className="block text-text/90"
-            style={{
-              fontSize: "clamp(18px, 3vw, 24px)",
-              fontWeight: 400,
-              letterSpacing: "0.05em",
-              marginBottom: "12px",
-              fontFamily: "var(--font-mono)",
-              textTransform: "uppercase",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            Hi, I&apos;m
-          </span>
-          <span
-            className="block gradient-text glow-text"
-            style={{
-              fontSize: "clamp(48px, 8vw, 90px)",
-              lineHeight: 0.95,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            {personalInfo.name}
-          </span>
-        </motion.h1>
-
-        {/* Full name */}
-        <motion.p
-          variants={itemVariants}
-          className="text-text-muted/80 font-light tracking-widest uppercase font-mono"
-          style={{ fontSize: "16px", marginBottom: "28px" }}
-        >
-          Md. Harun Or Rashid
-        </motion.p>
-
-        {/* TypeWriter roles */}
-        <motion.div
-          variants={itemVariants}
-          className="text-xl md:text-2xl font-light text-text-muted min-h-[2.5rem] flex items-center justify-center font-display"
-          style={{ marginBottom: "8px", letterSpacing: "-0.01em" }}
-        >
-          <TypeWriter
-            words={[
-              "Backend Software Engineer",
-              "Laravel & PHP Specialist",
-              "Applied AI / ML Enthusiast",
-              "System Architecture & API Design",
-              "Clean Code Advocate",
-            ]}
-          />
-        </motion.div>
-
-        {/* Summary */}
-        <motion.p
-          variants={itemVariants}
-          className="text-text-muted max-w-xl mx-auto leading-relaxed"
-          style={{
-            fontSize: "16px",
-            marginTop: "24px",
-            marginBottom: "32px",
-            lineHeight: 1.8,
-          }}
-        >
-          Building scalable backend systems and exploring the frontiers of AI.
-          Currently crafting enterprise solutions at Appinion BD.
-        </motion.p>
-
-        {/* CTA Action Buttons */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-wrap items-center justify-center"
-          style={{ gap: "14px", marginBottom: "36px" }}
-        >
-          <motion.a
-            href="#projects"
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center font-mono font-medium text-white rounded-full transition-all duration-300"
-            style={{
-              padding: "12px 28px",
-              fontSize: "13px",
-              background:
-                "linear-gradient(135deg, var(--color-accent-dark), var(--color-accent))",
-              boxShadow: "0 4px 24px rgba(99, 102, 241, 0.35)",
-              gap: "8px",
-              textDecoration: "none",
-            }}
-          >
-            <span>Explore Work</span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {/* Name */}
+          <h1 className="font-display text-[clamp(34px,7.2vw,72px)] font-bold leading-[1.05] tracking-[-0.035em] text-on-surface">
+            <SplitText text="Md. Harun Or Rashid" animateOnMount delay={0.3} stagger={0.07} />{" "}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 1.1, ease: EASE, delay: 0.65 }}
+              className="text-gradient-anim inline-block"
             >
-              <path d="M7 17L17 7M17 7H7M17 7V17" />
-            </svg>
-          </motion.a>
+              (Shoron)
+            </motion.span>
+          </h1>
 
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center font-mono font-medium text-text-muted hover:text-text rounded-full backdrop-blur-xl transition-all duration-300"
-            style={{
-              padding: "12px 28px",
-              fontSize: "13px",
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              gap: "8px",
-              textDecoration: "none",
-            }}
+          {/* Rotating role */}
+          <motion.p
+            {...fadeUp(0.8)}
+            className="mt-4 font-display text-[clamp(17px,2.6vw,24px)] font-medium tracking-tight text-secondary"
           >
-            <span>Get in Touch</span>
-          </motion.a>
-        </motion.div>
+            <RotatingRole />
+          </motion.p>
 
-        {/* Rotating tagline */}
-        <motion.div
-          variants={itemVariants}
-          className="flex items-center justify-center"
-        >
-          <RotatingTagline />
-        </motion.div>
+          {/* Value statement */}
+          <motion.div {...fadeUp(0.95)} className="mx-auto mt-6 max-w-2xl space-y-3">
+            <p className="text-[clamp(16px,2vw,20px)] font-medium leading-relaxed text-on-surface">
+              Crafting scalable backend architectures and exploring algorithmic deep learning.
+            </p>
+            <p className="text-[15px] leading-relaxed text-on-surface-variant/85">
+              Software Engineer at <span className="font-medium text-on-surface">Appinion BD</span>.
+              Focused on high-throughput services, distributed transaction systems, and applied AI.
+            </p>
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div
+            {...fadeUp(1.1)}
+            className="mt-9 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center"
+          >
+            <Magnetic strength={0.25} className="justify-center">
+              <a
+                href="#projects"
+                className="label-mono group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-7 py-3.5 text-on-primary shadow-[0_10px_30px_-8px_rgba(129,140,248,0.55)] transition-shadow duration-500 hover:shadow-[0_14px_40px_-6px_rgba(129,140,248,0.75)] sm:w-auto"
+              >
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <LuTerminal className="relative h-[18px] w-[18px]" />
+                <span className="relative">Explore Engineering Work</span>
+              </a>
+            </Magnetic>
+            <Magnetic strength={0.25} className="justify-center">
+              <a
+                href="#contact"
+                className="label-mono group inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.1] bg-surface-high/70 px-6 py-3.5 text-on-surface backdrop-blur transition-all duration-300 hover:border-tertiary/40 hover:bg-surface-highest sm:w-auto"
+              >
+                <LuMail className="h-[18px] w-[18px] text-tertiary transition-transform duration-300 group-hover:-rotate-12" />
+                Get in Touch
+              </a>
+            </Magnetic>
+            <Magnetic strength={0.25} className="justify-center">
+              <a
+                href={personalInfo.socials.github}
+                target="_blank"
+                rel="noreferrer"
+                className="label-mono group inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-surface-low/70 px-5 py-3.5 text-on-surface-variant backdrop-blur transition-all duration-300 hover:text-on-surface sm:w-auto"
+              >
+                <FaGithub className="h-4 w-4" />
+                silomentus
+                <LuArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </a>
+            </Magnetic>
+          </motion.div>
+
+          {/* Focus cards */}
+          <div className="mt-12 grid w-full grid-cols-1 gap-3 border-t border-white/[0.06] pt-10 sm:grid-cols-3">
+            {heroFocus.map((f) => {
+              const Icon = focusIcons[f.icon];
+              const a = ACCENT[f.accent];
+              return (
+                <div key={f.title}>
+                  <SpotlightCard
+                    accent={f.accent}
+                    className="glass flex h-full items-start gap-3 rounded-xl p-4 text-left transition-transform duration-500 hover:-translate-y-1"
+                  >
+                    <div className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg ${a.bg} ${a.text}`}>
+                      <Icon className="h-[18px] w-[18px]" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className={`badge-tag font-medium uppercase tracking-wide ${a.text}`}>{f.label}</span>
+                      <p className="font-display text-[14px] font-semibold tracking-tight text-on-surface">{f.title}</p>
+                      <p className="text-[12px] text-on-surface-variant/80">{f.sub}</p>
+                    </div>
+                  </SpotlightCard>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Tech marquee */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:flex short-hide"
+        transition={{ delay: 1.8, duration: 1 }}
+        className="mask-x relative mt-12 overflow-hidden"
       >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex flex-col items-center gap-3"
-        >
-          <span
-            className="text-text-muted/40 font-mono tracking-[0.2em] uppercase"
-            style={{ fontSize: "10px" }}
-          >
-            Scroll
-          </span>
-          <div
-            className="rounded-full flex justify-center pt-1.5"
-            style={{
-              width: "18px",
-              height: "28px",
-              border: "1.5px solid rgba(110, 110, 130, 0.3)",
-            }}
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0], opacity: [1, 0.2, 1] }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="rounded-full"
-              style={{
-                width: "3px",
-                height: "3px",
-                backgroundColor: "var(--color-accent)",
-              }}
-            />
-          </div>
-        </motion.div>
+        <div className="flex w-max animate-marquee gap-3 hover:[animation-play-state:paused]">
+          {[...marquee, ...marquee].map((t, i) => (
+            <span
+              key={i}
+              className="badge-tag whitespace-nowrap rounded-full border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-on-surface-variant/60"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
       </motion.div>
     </section>
   );

@@ -1,93 +1,65 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { FaGithub, FaLinkedin } from "react-icons/fa6";
+import { LuMail, LuTerminal } from "react-icons/lu";
+import { personalInfo } from "@/lib/data";
 
 export default function Footer() {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyEmail = () => {
-    const email = atob("c2lsb21lbnR1c0BnbWFpbC5jb20=");
-    navigator.clipboard.writeText(email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
-
   return (
-    <footer style={{ width: "100%", marginTop: "60px" }}>
-      {/* Section divider */}
-      <div className="section-divider" />
-      <div
-        className="flex flex-col items-center justify-center text-center"
-        style={{ padding: "48px 24px 36px", gap: "16px" }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex items-center font-mono font-bold tracking-wider"
-          style={{ fontSize: "15px", gap: "8px", color: "var(--color-text)" }}
-        >
-          <span
-            className="rounded-full bg-emerald-400"
-            style={{
-              width: "6px",
-              height: "6px",
-              boxShadow: "0 0 8px rgba(52, 211, 153, 0.8)",
-            }}
-          />
-          <span className="flex items-center">
-            <span className="text-accent font-light mr-0.5">&lt;</span>
-            <span className="tracking-widest">SHORON</span>
-            <span className="text-accent font-light ml-0.5">/&gt;</span>
-          </span>
-        </motion.div>
+    <footer className="relative z-10 w-full border-t border-white/[0.06] bg-surface-lowest">
+      <div className="container-x py-12 md:py-16">
+        <div className="flex flex-col items-center justify-between gap-6 pb-8 md:flex-row">
+          <div className="flex flex-col items-center gap-2 md:items-start">
+            <a
+              href="#home"
+              className="flex items-center gap-2 font-mono text-[14px] font-bold tracking-tight text-primary hover:opacity-80 transition-opacity"
+            >
+              <LuTerminal className="h-4 w-4" />
+              <span>&lt;SHORON /&gt;</span>
+            </a>
+            <p className="text-center text-[13px] text-on-surface-variant md:text-left">
+              Md. Harun Or Rashid • Backend Systems &amp; Algorithmic Machine Learning Engineer
+            </p>
+          </div>
 
-        {/* Quick Social Links */}
-        <div className="flex items-center gap-6 font-mono text-xs text-text-muted/70">
-          <a
-            href="https://github.com/silomentus"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-accent transition-colors"
-          >
-            GitHub ↗
-          </a>
-          <a
-            href="https://www.linkedin.com/in/md-harun-or-rashid-shoron/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-accent transition-colors"
-          >
-            LinkedIn ↗
-          </a>
-          <button
-            type="button"
-            onClick={handleCopyEmail}
-            className="hover:text-accent transition-colors cursor-pointer"
-            title="Click to copy email"
-          >
-            {copied ? (
-              <span className="text-emerald-400">Copied! ✓</span>
-            ) : (
-              "Email ↗"
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href={personalInfo.socials.github}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-white/[0.06] bg-surface-low text-on-surface-variant transition-colors hover:border-primary/40 hover:bg-surface-high hover:text-primary"
+            >
+              <FaGithub className="h-4 w-4" />
+            </a>
+            <a
+              href={personalInfo.socials.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-white/[0.06] bg-surface-low text-on-surface-variant transition-colors hover:border-primary/40 hover:bg-surface-high hover:text-primary"
+            >
+              <FaLinkedin className="h-4 w-4" />
+            </a>
+            <a
+              href="#contact"
+              aria-label="Contact"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-white/[0.06] bg-surface-low text-on-surface-variant transition-colors hover:border-primary/40 hover:bg-surface-high hover:text-primary"
+            >
+              <LuMail className="h-4 w-4" />
+            </a>
+          </div>
         </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-text-muted/50 font-mono"
-          style={{
-            fontSize: "11px",
-            letterSpacing: "0.02em",
-            marginTop: "6px",
-          }}
-        >
-          &copy; {new Date().getFullYear()} Md. Harun Or Rashid (Shoron). Designed &amp; Engineered with Next.js, Tailwind &amp; Three.js.
-        </motion.p>
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-white/[0.04] pt-6 sm:flex-row">
+          <p className="badge-tag text-center text-on-surface-variant/70 sm:text-left">
+            &copy; {new Date().getFullYear()} Md. Harun Or Rashid (Shoron). Engineered with architectural rigor.
+          </p>
+          <div className="flex items-center gap-2 badge-tag text-on-surface-variant/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-tertiary" />
+            <span>Next.js • Tailwind CSS • Lenis • Distributed Systems</span>
+          </div>
+        </div>
       </div>
     </footer>
   );
