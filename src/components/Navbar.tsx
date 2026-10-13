@@ -180,11 +180,11 @@ export default function Navbar({
         {open && (
           <motion.div
             key="mobile-menu"
-            initial={{ clipPath: "circle(0% at calc(100% - 36px) 32px)" }}
-            animate={{ clipPath: "circle(150% at calc(100% - 36px) 32px)" }}
-            exit={{ clipPath: "circle(0% at calc(100% - 36px) 32px)" }}
-            transition={{ duration: 0.7, ease: EASE }}
-            className="fixed inset-0 z-40 overflow-y-auto bg-[rgba(7,7,11,0.97)] backdrop-blur-2xl lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="fixed inset-0 z-40 overflow-y-auto bg-[rgba(7,7,11,0.97)] lg:hidden"
             data-lenis-prevent
           >
             <div className="grid-fade pointer-events-none absolute inset-0 opacity-60" />

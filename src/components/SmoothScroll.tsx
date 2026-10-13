@@ -14,24 +14,30 @@ export function setScrollLocked(locked: boolean) {
     if (locked) lenisInstance.stop();
     else lenisInstance.start();
   }
-  document.documentElement.style.overflow = locked ? "hidden" : "";
+  if (locked) {
+    document.documentElement.style.overflow = "hidden";
+  } else {
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+  }
 }
 
 /**
- * Inertia-based smooth scrolling for wheel/trackpad.
- * Touch devices keep native momentum scrolling (feels best on phones).
- * Disabled entirely for users who prefer reduced motion.
+ * Inertia-based smooth scrolling for wheel/trackpad on desktop.
+ * On mobile/touch devices, Lenis is disabled to let the mobile OS handle
+ * native momentum scrolling with 0ms touch delay and no gesture blocking.
  */
 export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Don't hijack mobile touch scrolling — native mobile inertia is faster & never locks up
+    if (window.matchMedia("(pointer: coarse)").matches || "ontouchstart" in window) return;
 
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 1.2,
     });
     lenisInstance = lenis;
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { setScrollLocked } from "@/components/SmoothScroll";
 
 const GAME_DURATION = 30;
 const SHIP_SIZE = 20;
@@ -45,6 +46,11 @@ export default function SpaceGame({
   const [internalOpen, setInternalOpen] = useState(false);
   const gameOpen = open ?? internalOpen;
   const setGameOpen = onOpenChange ?? setInternalOpen;
+
+  useEffect(() => {
+    setScrollLocked(gameOpen);
+    return () => setScrollLocked(false);
+  }, [gameOpen]);
   const [gameState, setGameState] = useState<
     "menu" | "playing" | "gameover"
   >("menu");
@@ -498,20 +504,16 @@ export default function SpaceGame({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6"
-            style={{
-              backgroundColor: "rgba(6, 6, 8, 0.92)",
-              backdropFilter: "blur(10px)",
-            }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 bg-[rgba(6,6,8,0.92)] backdrop-blur-md"
           >
             <motion.div
               ref={containerRef}
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               transition={{
-                duration: 0.3,
+                duration: 0.18,
                 ease: [0.25, 0.1, 0, 1],
               }}
               className="relative w-full h-full"
