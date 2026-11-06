@@ -74,7 +74,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${dmSans.variable} ${sora.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="antialiased grain bg-canvas text-on-surface">
+      <body className="antialiased">
         {children}
         <Analytics />
       </body>
