@@ -61,7 +61,6 @@ export default function Home() {
     window.addEventListener("resize", update);
     return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, []);
-  const [motionPaused, setMotionPaused] = useState(false);
   const [copied, setCopied] = useState(false);
   const [cvOpen, setCvOpen] = useState(false);
   useEffect(() => {
@@ -71,7 +70,7 @@ export default function Home() {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         observer.unobserve(entry.target);
-        if (media.matches || motionPaused) return;
+        if (media.matches) return;
         const animation = entry.target.animate(
           [{ opacity: 0, transform: "translateY(65px) scale(.96)" }, { opacity: 1, transform: "translateY(0) scale(1)" }],
           { duration: 1000, easing: "cubic-bezier(.2,.7,.2,1)", delay: Number((entry.target as HTMLElement).dataset.motionDelay || 0), fill: "backwards" }
@@ -94,16 +93,15 @@ export default function Home() {
       animations.forEach(animation => animation.cancel());
       media.removeEventListener("change", stopMotion);
     };
-  }, [motionPaused]);
+  }, []);
   const projects = [industryProjects[2], industryProjects[0], industryProjects[4], industryProjects[1], industryProjects[3], industryProjects[5]];
-  return <div className={`folio${motionPaused ? " motion-paused" : ""}`} ref={root}>
-    <button className="motion-toggle" onClick={() => setMotionPaused(p => !p)} aria-pressed={motionPaused}>{motionPaused ? "▶ Play motion" : "Ⅱ Pause motion"}</button>
+  return <div className="folio" ref={root}>
     <div className="reading-progress" aria-hidden="true"/>
     <a className="skip" href="#main">Skip to content</a>
     <header className="nav"><a className="wordmark" href="#"><span className="brand-emblem"><BrandMark /></span>shoron</a><nav aria-label="Main navigation"><a href="#work">Work</a><a href="#experience">Experience</a><a href="#research">Research</a><a href="#journal">Journal</a></nav><button className="nav-contact cv-trigger" onClick={() => setCvOpen(true)}>Request CV <span><ArrowIcon /></span></button></header>
     <main id="main">
       <section className="hero" onPointerMove={event => {
-        if (motionPaused || event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const bounds = event.currentTarget.getBoundingClientRect();
         event.currentTarget.style.setProperty("--pointer-x", `${((event.clientX - bounds.left) / bounds.width - .5) * 65}px`);
         event.currentTarget.style.setProperty("--pointer-y", `${((event.clientY - bounds.top) / bounds.height - .5) * 45}px`);
