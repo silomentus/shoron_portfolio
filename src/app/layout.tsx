@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Sora, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { profileStructuredData, siteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -22,6 +23,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  alternates: { canonical: "/" },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
   title: "Md. Harun Or Rashid (Shoron) | Backend Software Engineer",
   description:
     "Portfolio of Md. Harun Or Rashid (Shoron) — Backend Software Engineer at Appinion BD specializing in scalable architectures, Laravel, PHP, MySQL, REST APIs, and applied AI/ML systems.",
@@ -43,6 +49,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Md. Harun Or Rashid (Shoron)" }],
   creator: "Md. Harun Or Rashid (Shoron)",
   openGraph: {
+    url: siteUrl,
     type: "website",
     locale: "en_US",
     title: "Md. Harun Or Rashid (Shoron) | Backend Software Engineer",
@@ -76,6 +83,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${dmSans.variable} ${sora.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <body className="antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(profileStructuredData).replace(/</g, "\\u003c"),
+          }}
+        />
         {children}
         <Analytics />
       </body>
